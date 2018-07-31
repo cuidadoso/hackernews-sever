@@ -1,0 +1,13 @@
+schema {
+    query: Query
+}
+
+type Query {
+    allLinks: [Link]
+}
+
+type Link {
+    id: Long!
+    url: String!
+    description: String!
+}

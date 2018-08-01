@@ -5,9 +5,16 @@ schema {
 
 type Query {
     allLinks: [Link]
+    link(id: ID!): Link
+    linksByUrl(url: String!): [Link]
+    allUsers: [User]
+    user(id: ID!): User
+    usersByEmail(email: String!): [User]
 }
 
 type Mutation {
+    createUser(name: String!, email: String!, password: String!): User
+    createUserAuth(name: String!, authData: AuthData!): User
     createLink(url: String!, description: String!): Link
 }
 
@@ -15,4 +22,16 @@ type Link {
     id: Long!
     url: String!
     description: String!
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String
+    password: String
+}
+
+input AuthData {
+    email: String!
+    password: String!
 }

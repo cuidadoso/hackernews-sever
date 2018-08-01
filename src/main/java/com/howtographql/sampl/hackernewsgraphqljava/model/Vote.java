@@ -1,35 +1,31 @@
 package com.howtographql.sampl.hackernewsgraphqljava.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.ZonedDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Link {
+public class Vote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String url;
-    private String description;
+    private ZonedDateTime createdAt;
     private Long userId;
+    private Long linkId;
 
     @Builder
-    public Link(String url, String description) {
-        this.url = url;
-        this.description = description;
-    }
-
-    @Builder
-    public Link(String url, String description, Long userId) {
-        this.url = url;
-        this.description = description;
-        this.userId = userId;
+    public Vote(ZonedDateTime createdAt, Long userId, Long linkId) {
+        this(null, createdAt, userId, linkId);
     }
 }

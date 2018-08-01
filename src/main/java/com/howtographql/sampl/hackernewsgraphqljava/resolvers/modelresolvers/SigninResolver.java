@@ -1,4 +1,4 @@
-package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
+package com.howtographql.sampl.hackernewsgraphqljava.resolvers.modelresolvers;
 
 import com.coxautodev.graphql.tools.GraphQLResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.SigninPayload;

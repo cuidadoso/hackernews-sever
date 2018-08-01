@@ -15,7 +15,15 @@ public class DataProvider implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... strings) throws Exception {
-        linkRepository.save(new Link("http://howtographql.com", "Your favorite GraphQL page"));
-        linkRepository.save(new Link("http://graphql.org/learn/", "The official docks"));
+        linkRepository.save(Link
+                .builder()
+                .url("http://howtographql.com")
+                .description("Your favorite GraphQL page")
+                .build());
+        linkRepository.save(Link
+                .builder()
+                .url("http://graphql.org/learn/")
+                .description("The official docks")
+                .build());
     }
 }

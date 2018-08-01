@@ -3,10 +3,8 @@ package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.Link;
 import com.howtographql.sampl.hackernewsgraphqljava.model.User;
-import com.howtographql.sampl.hackernewsgraphqljava.repository.LinkRepository;
-import com.howtographql.sampl.hackernewsgraphqljava.repository.LinkSpecifications;
-import com.howtographql.sampl.hackernewsgraphqljava.repository.UserRepository;
-import com.howtographql.sampl.hackernewsgraphqljava.repository.UserSpecifications;
+import com.howtographql.sampl.hackernewsgraphqljava.model.Vote;
+import com.howtographql.sampl.hackernewsgraphqljava.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +17,7 @@ import static com.howtographql.sampl.hackernewsgraphqljava.util.Collections.make
 public class Query implements GraphQLQueryResolver {
     private final LinkRepository linkRepository;
     private final UserRepository userRepository;
+    private final VoteRepository voteRepository;
 
     // Link query resolvers
     public List<Link> allLinks() {
@@ -46,5 +45,26 @@ public class Query implements GraphQLQueryResolver {
     public List<User> usersByEmail(String email) {
         // return makeList(userRepository.findAll(UserSpecifications.userByEmail(email)));
         return userRepository.findAllByEmailContains(email);
+    }
+
+    // Vote query resolvers
+    public List<Vote> allVotes() {
+        return voteRepository.findAll();
+    }
+
+    public Vote vote(Long id) {
+        return voteRepository.findOne(id);
+    }
+
+    public List<Vote> votesByUser(Long userId) {
+        return voteRepository.findAllByUserId(userId);
+    }
+
+    public List<Vote> votesByLink(Long linkId) {
+        return voteRepository.findAllByLinkId(linkId);
+    }
+
+    public Vote voteByUserAndLink(Long userId, Long linkId) {
+        return voteRepository.findByUserIdAndLinkId(userId, linkId);
     }
 }

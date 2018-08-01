@@ -10,6 +10,11 @@ type Query {
     allUsers: [User]
     user(id: ID!): User
     usersByEmail(email: String!): [User]
+    allVotes: [Vote]
+    vote(id: ID!): Vote
+    votesByUser(userId: ID!): [Vote]
+    votesByLink(linkId: ID!): [Vote]
+    voteByUserAndLink(userId: ID!, linkId: ID!): Vote
 }
 
 type Mutation {
@@ -17,6 +22,7 @@ type Mutation {
     createUserAuth(name: String!, authData: AuthData!): User
     signinUser(auth: AuthData): SigninPayload
     createLink(url: String!, description: String!): Link
+    createVote(linkId: ID!, userId: ID!): Vote
 }
 
 type Link {
@@ -42,3 +48,12 @@ type SigninPayload {
     token: Long
     user: User
 }
+
+type Vote {
+    id: ID!
+    createdAt: DateTime!
+    user: User!
+    link: Link!
+}
+
+scalar DateTime

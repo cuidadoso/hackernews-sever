@@ -18,6 +18,7 @@ public class Link {
     private Long id;
     private String url;
     private String description;
+    private Long userId;
 
     public Link(String url, String description) {
         this.url = url;

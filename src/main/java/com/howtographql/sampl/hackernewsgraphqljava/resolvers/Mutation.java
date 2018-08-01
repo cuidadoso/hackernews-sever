@@ -29,11 +29,13 @@ public class Mutation implements GraphQLMutationResolver {
 
     // Link mutation resolvers
     public Link createLink(String url, String description, DataFetchingEnvironment env) {
+        AuthContext context = env.getContext();
         return linkRepository.save(Link
                 .builder()
                 .url(url)
                 .description(description)
-                .userId((Long) store.get("userId"))
+                // .userId((Long) store.get("userId"))
+                .userId(context.getUser().getId())
                 .build());
     }
 
@@ -59,6 +61,7 @@ public class Mutation implements GraphQLMutationResolver {
     public SigninPayload signinUser(AuthData auth) throws IllegalAccessException {
         User user = userRepository.findByEmail(auth.getEmail());
         if (user.getPassword().equals(auth.getPassword())) {
+            // TODO replace with OAht2 + JWT implementation
             store.put("userId", user.getId());
             return new SigninPayload(user.getId(), user);
         }

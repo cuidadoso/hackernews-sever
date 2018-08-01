@@ -3,9 +3,11 @@ package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.AuthData;
 import com.howtographql.sampl.hackernewsgraphqljava.model.Link;
+import com.howtographql.sampl.hackernewsgraphqljava.model.SigninPayload;
 import com.howtographql.sampl.hackernewsgraphqljava.model.User;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.LinkRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.UserRepository;
+import graphql.GraphQLException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -42,5 +44,13 @@ public class Mutation implements GraphQLMutationResolver {
                 .email(authData.getEmail())
                 .password(authData.getPassword())
                 .build());
+    }
+
+    public SigninPayload signinUser(AuthData auth) throws IllegalAccessException {
+        User user = userRepository.findByEmail(auth.getEmail());
+        if (user.getPassword().equals(auth.getPassword())) {
+            return new SigninPayload(user.getId(), user);
+        }
+        throw new GraphQLException("Invalid credentials");
     }
 }

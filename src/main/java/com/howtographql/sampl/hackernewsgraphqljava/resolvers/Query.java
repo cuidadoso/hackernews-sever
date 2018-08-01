@@ -30,7 +30,8 @@ public class Query implements GraphQLQueryResolver {
     }
 
     public List<Link> linksByUrl(String url) {
-        return makeList(linkRepository.findAll(LinkSpecifications.linkByUrl(url)));
+        // return makeList(linkRepository.findAll(LinkSpecifications.linkByUrl(url)));
+        return linkRepository.findAllByUrlContains(url);
     }
 
     // User query resolvers
@@ -43,6 +44,7 @@ public class Query implements GraphQLQueryResolver {
     }
 
     public List<User> usersByEmail(String email) {
-        return makeList(userRepository.findAll(UserSpecifications.userByEmail(email)));
+        // return makeList(userRepository.findAll(UserSpecifications.userByEmail(email)));
+        return userRepository.findAllByEmailContains(email);
     }
 }

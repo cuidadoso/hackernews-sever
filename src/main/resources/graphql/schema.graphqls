@@ -15,11 +15,12 @@ type Query {
 type Mutation {
     createUser(name: String!, email: String!, password: String!): User
     createUserAuth(name: String!, authData: AuthData!): User
+    signinUser(auth: AuthData): SigninPayload
     createLink(url: String!, description: String!): Link
 }
 
 type Link {
-    id: Long!
+    id: ID!
     url: String!
     description: String!
 }
@@ -34,4 +35,9 @@ type User {
 input AuthData {
     email: String!
     password: String!
+}
+
+type SigninPayload {
+    token: Long
+    user: User
 }

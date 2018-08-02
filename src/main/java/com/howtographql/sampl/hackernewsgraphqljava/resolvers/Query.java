@@ -2,10 +2,12 @@ package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.Link;
+import com.howtographql.sampl.hackernewsgraphqljava.model.LinkFilter;
 import com.howtographql.sampl.hackernewsgraphqljava.model.User;
 import com.howtographql.sampl.hackernewsgraphqljava.model.Vote;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,7 +22,18 @@ public class Query implements GraphQLQueryResolver {
     private final VoteRepository voteRepository;
 
     // Link query resolvers
-    public List<Link> allLinks() {
+    public List<Link> allLinks(LinkFilter filter) {
+        if(filter != null && filter.getUrlContains() != null && filter.getDescriptionContains() != null) {
+            return linkRepository.findAllByUrlContainsAndDescriptionContains(filter.getUrlContains(), filter.getDescriptionContains());
+        }
+        if(filter != null && filter.getUrlContains() != null) {
+            // return makeList(linkRepository.findAll(LinkSpecifications.linkByUrl(filter.getUrlContains())));
+            return linkRepository.findAllByUrlContains(filter.getUrlContains());
+        }
+        if(filter != null && filter.getDescriptionContains() != null) {
+            // return makeList(linkRepository.findAll(LinkSpecifications.linkByDescription(filter.getDescriptionContains())));
+            return linkRepository.findAllByDescriptionContains(filter.getDescriptionContains());
+        }
         return linkRepository.findAll();
     }
 
@@ -28,13 +41,12 @@ public class Query implements GraphQLQueryResolver {
         return linkRepository.findOne(id);
     }
 
-    public List<Link> linksByUrl(String url) {
-        // return makeList(linkRepository.findAll(LinkSpecifications.linkByUrl(url)));
-        return linkRepository.findAllByUrlContains(url);
-    }
-
     // User query resolvers
-    public List<User> allUsers() {
+    public List<User> allUsers(String email) {
+        if (!StringUtils.isBlank(email)) {
+            // return makeList(userRepository.findAll(UserSpecifications.userByEmail(email)));
+            return userRepository.findAllByEmailContains(email);
+        }
         return userRepository.findAll();
     }
 
@@ -42,29 +54,21 @@ public class Query implements GraphQLQueryResolver {
         return userRepository.findOne(id);
     }
 
-    public List<User> usersByEmail(String email) {
-        // return makeList(userRepository.findAll(UserSpecifications.userByEmail(email)));
-        return userRepository.findAllByEmailContains(email);
-    }
-
     // Vote query resolvers
-    public List<Vote> allVotes() {
+    public List<Vote> allVotes(Long userId, Long linkId) {
+        if (userId != null && linkId != null) {
+            return voteRepository.findAllByUserIdAndLinkId(userId, linkId);
+        }
+        if (userId != null) {
+            return voteRepository.findAllByUserId(userId);
+        }
+        if (linkId != null) {
+            return voteRepository.findAllByLinkId(linkId);
+        }
         return voteRepository.findAll();
     }
 
     public Vote vote(Long id) {
         return voteRepository.findOne(id);
-    }
-
-    public List<Vote> votesByUser(Long userId) {
-        return voteRepository.findAllByUserId(userId);
-    }
-
-    public List<Vote> votesByLink(Long linkId) {
-        return voteRepository.findAllByLinkId(linkId);
-    }
-
-    public Vote voteByUserAndLink(Long userId, Long linkId) {
-        return voteRepository.findByUserIdAndLinkId(userId, linkId);
     }
 }

@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface LinkRepository extends JpaRepository<Link, Long>, QueryDslPredicateExecutor<Link> {
     List<Link> findAllByUrlContains(String url);
+    List<Link> findAllByDescriptionContains(String description);
+    List<Link> findAllByUrlContainsAndDescriptionContains(String url, String description);
 }

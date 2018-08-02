@@ -9,5 +9,5 @@ import java.util.List;
 public interface VoteRepository extends JpaRepository<Vote, Long>, QueryDslPredicateExecutor<Vote> {
     List<Vote> findAllByUserId(Long userId);
     List<Vote> findAllByLinkId(Long linkId);
-    Vote findByUserIdAndLinkId(Long userId, Long linkId);
+    List<Vote> findAllByUserIdAndLinkId(Long userId, Long linkId);
 }

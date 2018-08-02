@@ -7,4 +7,8 @@ public class LinkSpecifications {
     public static BooleanExpression linkByUrl(String url) {
         return QLink.link.url.contains(url);
     }
+
+    public static BooleanExpression linkByDescription(String description) {
+        return QLink.link.description.contains(description);
+    }
 }

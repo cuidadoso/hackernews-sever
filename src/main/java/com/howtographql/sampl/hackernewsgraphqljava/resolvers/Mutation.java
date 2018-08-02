@@ -39,6 +39,14 @@ public class Mutation implements GraphQLMutationResolver {
                 .build());
     }
 
+    public boolean deleteLink(Long id) {
+        if (linkRepository.exists(id)) {
+            linkRepository.delete(id);
+            return true;
+        }
+        throw new GraphQLException("Link not exists");
+    }
+
     // User mutation resolvers
     public User createUser(String name, String email, String password) {
         return userRepository.save(User
@@ -47,6 +55,14 @@ public class Mutation implements GraphQLMutationResolver {
                 .email(email)
                 .password(password)
                 .build());
+    }
+
+    public boolean deleteUset(Long id) {
+        if (userRepository.exists(id)) {
+            userRepository.delete(id);
+            return true;
+        }
+        throw new GraphQLException("User not exists");
     }
 
     public User createUserAuth(String name, AuthData authData) {
@@ -77,5 +93,13 @@ public class Mutation implements GraphQLMutationResolver {
                 .userId(userId)
                 .linkId(linkId)
                 .build());
+    }
+
+    public boolean deleteVote(Long id) {
+        if (voteRepository.exists(id)) {
+            voteRepository.delete(id);
+            return true;
+        }
+        throw new GraphQLException("Vote not exists");
     }
 }

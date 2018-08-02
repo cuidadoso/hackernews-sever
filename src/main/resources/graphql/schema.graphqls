@@ -19,10 +19,13 @@ type Query {
 
 type Mutation {
     createUser(name: String!, email: String!, password: String!): User
+    deleteUset(id: ID!): Boolean
     createUserAuth(name: String!, authData: AuthData!): User
     signinUser(auth: AuthData): SigninPayload
     createLink(url: String!, description: String!): Link
+    deleteLink(id: ID!): Boolean
     createVote(linkId: ID!, userId: ID!): Vote
+    deleteVote(id: ID!): Boolean
 }
 
 type Link {

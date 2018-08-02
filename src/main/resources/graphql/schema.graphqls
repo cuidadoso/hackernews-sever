@@ -4,11 +4,11 @@ schema {
 }
 
 type Query {
-    allLinks(filter: LinkFilter): [Link]
+    allLinks(filter: LinkFilter = {}, skip: Int = 10, first: Int = 0): [Link]
     link(id: ID!): Link
-    allUsers(email: String): [User]
+    allUsers(email: String, skip: Int = 10, first: Int = 0): [User]
     user(id: ID!): User
-    allVotes(userId: ID, linkId: ID): [Vote]
+    allVotes(userId: ID, linkId: ID, skip: Int = 10, first: Int = 0): [Vote]
     vote(id: ID!): Vote
 }
 

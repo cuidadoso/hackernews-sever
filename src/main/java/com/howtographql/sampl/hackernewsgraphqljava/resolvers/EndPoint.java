@@ -5,6 +5,7 @@ import com.howtographql.sampl.hackernewsgraphqljava.repository.UserRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.resolvers.exceptions.ErrorHandler;
 import graphql.schema.GraphQLSchema;
 import graphql.servlet.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,12 @@ public class EndPoint extends SimpleGraphQLServlet {
                 .map(req -> req.getHeader("Authorization"))
                 .filter(id -> !id.isEmpty())
                 .map(id -> id.replace("Bearer ", ""))
-                .map(id -> userRepository.findOne(Long.parseLong(id)))
+                .map(id -> {
+                    if (StringUtils.isNumeric(id)) {
+                        return userRepository.findOne(Long.parseLong(id));
+                    }
+                    return userRepository.findOne(1L);
+                })
                 .orElse(userRepository.findOne(1L));
         return new AuthContext(user, request, response);
     }

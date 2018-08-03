@@ -27,15 +27,18 @@ public class Mutation implements GraphQLMutationResolver {
     @Resource(name = "store")
     private Map<String, Object> store;
 
+    private static final ZonedDateTime NOW = Instant.now().atZone(UTC);
+
     // Link mutation resolvers
     public Link createLink(String url, String description, DataFetchingEnvironment env) {
         AuthContext context = env.getContext();
         return linkRepository.save(Link
                 .builder()
+                .createdAt(NOW)
                 .url(url)
                 .description(description)
-                // .userId((Long) store.get("userId"))
-                .userId(context.getUser().getId())
+                .userId((Long) store.get("userId"))
+                //.userId(context.getUser().getId())
                 .build());
     }
 
@@ -86,10 +89,9 @@ public class Mutation implements GraphQLMutationResolver {
 
     // Vote mutation resolvers
     public Vote createVote(Long linkId, Long userId) {
-        ZonedDateTime now = Instant.now().atZone(UTC);
         return voteRepository.save(Vote
                 .builder()
-                .createdAt(now)
+                .createdAt(NOW)
                 .userId(userId)
                 .linkId(linkId)
                 .build());

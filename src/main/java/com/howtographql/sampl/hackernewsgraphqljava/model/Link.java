@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.ZonedDateTime;
 
 @Entity
 @Getter
@@ -16,6 +17,7 @@ public class Link {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private ZonedDateTime createdAt;
     private String url;
     private String description;
     private Long userId;
@@ -27,9 +29,7 @@ public class Link {
     }
 
     @Builder
-    public Link(String url, String description, Long userId) {
-        this.url = url;
-        this.description = description;
-        this.userId = userId;
+    public Link(ZonedDateTime createdAt, String url, String description, Long userId) {
+        this(null, createdAt, url, description, userId);
     }
 }

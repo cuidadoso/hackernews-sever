@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,8 +25,9 @@ public class Query implements GraphQLQueryResolver {
     private final VoteRepository voteRepository;
 
     // Link query resolvers
-    public List<Link> allLinks(LinkFilter filter, int skip, int first) {
-        Pageable pageable = new PageRequest(first, skip);
+    public List<Link> allLinks(LinkFilter filter, int skip, int first, String orderBy) {
+        Pageable pageable = new PageRequest(first, skip, new Sort(new Sort.Order(Sort.Direction.ASC, orderBy)));
+
         if(filter != null && filter.getUrlContains() != null && filter.getDescriptionContains() != null) {
             return linkRepository.findAllByUrlContainsAndDescriptionContains(filter.getUrlContains(), filter.getDescriptionContains(), pageable);
         }
@@ -45,8 +47,8 @@ public class Query implements GraphQLQueryResolver {
     }
 
     // User query resolvers
-    public List<User> allUsers(String email, int skip, int first) {
-        Pageable pageable = new PageRequest(first, skip);
+    public List<User> allUsers(String email, int skip, int first, String orderBy) {
+        Pageable pageable = new PageRequest(first, skip, new Sort(new Sort.Order(Sort.Direction.ASC, orderBy)));
         if (!StringUtils.isBlank(email)) {
             // return makeList(userRepository.findAll(UserSpecifications.userByEmail(email)));
             return userRepository.findAllByEmailContains(email, pageable);
@@ -59,8 +61,8 @@ public class Query implements GraphQLQueryResolver {
     }
 
     // Vote query resolvers
-    public List<Vote> allVotes(Long userId, Long linkId, int skip, int first) {
-        Pageable pageable = new PageRequest(first, skip);
+    public List<Vote> allVotes(Long userId, Long linkId, int skip, int first, String orderBy) {
+        Pageable pageable = new PageRequest(first, skip, new Sort(new Sort.Order(Sort.Direction.ASC, orderBy)));
         if (userId != null && linkId != null) {
             return voteRepository.findAllByUserIdAndLinkId(userId, linkId, pageable);
         }

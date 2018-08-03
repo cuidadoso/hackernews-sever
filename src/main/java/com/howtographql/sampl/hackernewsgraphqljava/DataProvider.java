@@ -7,21 +7,30 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
+
+import static java.time.ZoneOffset.UTC;
+
 @Component
 @RequiredArgsConstructor
 public class DataProvider implements CommandLineRunner {
     private final LinkRepository linkRepository;
+
+    private static final ZonedDateTime NOW = Instant.now().atZone(UTC);
 
     @Override
     @Transactional
     public void run(String... strings) throws Exception {
         linkRepository.save(Link
                 .builder()
+                .createdAt(NOW)
                 .url("http://howtographql.com")
                 .description("Your favorite GraphQL page")
                 .build());
         linkRepository.save(Link
                 .builder()
+                .createdAt(NOW)
                 .url("http://graphql.org/learn/")
                 .description("The official docks")
                 .build());

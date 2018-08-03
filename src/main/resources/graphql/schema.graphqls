@@ -4,11 +4,11 @@ schema {
 }
 
 type Query {
-    allLinks(filter: LinkFilter = {}, skip: Int = 10, first: Int = 0): [Link]
+    allLinks(filter: LinkFilter = {}, skip: Int = 10, first: Int = 0, orderBy: String = "id"): [Link]
     link(id: ID!): Link
-    allUsers(email: String, skip: Int = 10, first: Int = 0): [User]
+    allUsers(email: String, skip: Int = 10, first: Int = 0, orderBy: String = "id"): [User]
     user(id: ID!): User
-    allVotes(userId: ID, linkId: ID, skip: Int = 10, first: Int = 0): [Vote]
+    allVotes(userId: ID, linkId: ID, skip: Int = 10, first: Int = 0, orderBy: String = "id"): [Vote]
     vote(id: ID!): Vote
 }
 
@@ -25,9 +25,11 @@ type Mutation {
 
 type Link {
     id: ID!
+    createdAt: DateTime!
     url: String!
     description: String
     postedBy: User
+    votes: [Vote]
 }
 
 type User {

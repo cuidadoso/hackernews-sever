@@ -77,9 +77,29 @@ public class Mutation implements GraphQLMutationResolver {
                 .build());
     }
 
-    public SigninPayload signinUser(AuthData auth) throws IllegalAccessException {
+    public SigninPayload signUp(String name, String email, String password) {
+        User user = userRepository.save(User
+                .builder()
+                .name(name)
+                .email(email)
+                .password(password)
+                .build());
+        return new SigninPayload(user.getId(), user);
+    }
+
+    public SigninPayload signIn(AuthData auth) throws IllegalAccessException {
         User user = userRepository.findByEmail(auth.getEmail());
         if (user.getPassword().equals(auth.getPassword())) {
+            // TODO replace with OAht2 + JWT implementation
+            store.put("userId", user.getId());
+            return new SigninPayload(user.getId(), user);
+        }
+        throw new GraphQLException("Invalid credentials");
+    }
+
+    public SigninPayload login(String email, String password) throws IllegalAccessException {
+        User user = userRepository.findByEmail(email);
+        if (user.getPassword().equals(password)) {
             // TODO replace with OAht2 + JWT implementation
             store.put("userId", user.getId());
             return new SigninPayload(user.getId(), user);
@@ -93,6 +113,15 @@ public class Mutation implements GraphQLMutationResolver {
                 .builder()
                 .createdAt(NOW)
                 .userId(userId)
+                .linkId(linkId)
+                .build());
+    }
+
+    public Vote vote(Long linkId) {
+        return voteRepository.save(Vote
+                .builder()
+                .createdAt(NOW)
+                .userId((Long) store.get("userId"))
                 .linkId(linkId)
                 .build());
     }

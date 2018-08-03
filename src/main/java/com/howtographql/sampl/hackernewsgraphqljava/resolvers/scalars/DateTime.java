@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class DateTime extends GraphQLScalarType {
 
-    private static Coercing dateTime = new Coercing() {
+    private static final Coercing DATE_TIME = new Coercing() {
         @Override
         public String serialize(Object input) {
             //serialize the ZonedDateTime into string on the way out
@@ -35,7 +35,7 @@ public class DateTime extends GraphQLScalarType {
     };
 
     public DateTime() {
-        super("DateTime", "DataTime scalar", dateTime);
+        super("DateTime", "DataTime scalar", DATE_TIME);
     }
 
 }

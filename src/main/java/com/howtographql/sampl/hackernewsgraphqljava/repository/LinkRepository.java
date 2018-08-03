@@ -10,5 +10,5 @@ import java.util.List;
 public interface LinkRepository extends JpaRepository<Link, Long>, QueryDslPredicateExecutor<Link> {
     List<Link> findAllByUrlContains(String url, Pageable pageable);
     List<Link> findAllByDescriptionContains(String description, Pageable pageable);
-    List<Link> findAllByUrlContainsAndDescriptionContains(String url, String description, Pageable pageable);
+    List<Link> findAllByUrlContainsOrDescriptionContains(String url, String description, Pageable pageable);
 }

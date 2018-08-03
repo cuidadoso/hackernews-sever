@@ -11,11 +11,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Collections.makeList;
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Component
 @RequiredArgsConstructor
@@ -25,11 +29,11 @@ public class Query implements GraphQLQueryResolver {
     private final VoteRepository voteRepository;
 
     // Link query resolvers
-    public List<Link> allLinks(LinkFilter filter, int skip, int first, String orderBy) {
-        Pageable pageable = new PageRequest(first, skip, new Sort(new Sort.Order(Sort.Direction.ASC, orderBy)));
+    public List<Link> links(LinkFilter filter, int skip, int first, String orderBy) {
+        Pageable pageable = new PageRequest(skip, first, orders(orderBy, Link.class));
 
         if(filter != null && filter.getUrlContains() != null && filter.getDescriptionContains() != null) {
-            return linkRepository.findAllByUrlContainsAndDescriptionContains(filter.getUrlContains(), filter.getDescriptionContains(), pageable);
+            return linkRepository.findAllByUrlContainsOrDescriptionContains(filter.getUrlContains(), filter.getDescriptionContains(), pageable);
         }
         if(filter != null && filter.getUrlContains() != null) {
             // return makeList(linkRepository.findAll(LinkSpecifications.linkByUrl(filter.getUrlContains())));
@@ -47,8 +51,8 @@ public class Query implements GraphQLQueryResolver {
     }
 
     // User query resolvers
-    public List<User> allUsers(String email, int skip, int first, String orderBy) {
-        Pageable pageable = new PageRequest(first, skip, new Sort(new Sort.Order(Sort.Direction.ASC, orderBy)));
+    public List<User> users(String email, int skip, int first, String orderBy) {
+        Pageable pageable = new PageRequest(skip, first, orders(orderBy, User.class));
         if (!StringUtils.isBlank(email)) {
             // return makeList(userRepository.findAll(UserSpecifications.userByEmail(email)));
             return userRepository.findAllByEmailContains(email, pageable);
@@ -61,8 +65,8 @@ public class Query implements GraphQLQueryResolver {
     }
 
     // Vote query resolvers
-    public List<Vote> allVotes(Long userId, Long linkId, int skip, int first, String orderBy) {
-        Pageable pageable = new PageRequest(first, skip, new Sort(new Sort.Order(Sort.Direction.ASC, orderBy)));
+    public List<Vote> votes(Long userId, Long linkId, int skip, int first, String orderBy) {
+        Pageable pageable = new PageRequest(skip, first, orders(orderBy, Vote.class));
         if (userId != null && linkId != null) {
             return voteRepository.findAllByUserIdAndLinkId(userId, linkId, pageable);
         }
@@ -77,5 +81,21 @@ public class Query implements GraphQLQueryResolver {
 
     public Vote vote(Long id) {
         return voteRepository.findOne(id);
+    }
+
+    private Sort orders(String orderBy, Class clazz) {
+        if (orderBy != null) {
+            String[] orderParams = orderBy.split("_");
+            Direction direction = Direction.fromStringOrNull(orderParams[1]);
+            try {
+                Field field = clazz.getField(orderParams[0]);
+                return new Sort(new Sort.Order(direction == null ? ASC : DESC, field.getName()));
+            } catch (NoSuchFieldException e) {
+                // TODO logging
+                return new Sort(new Sort.Order(direction == null ? ASC : DESC, "id"));
+            }
+        } else {
+            return null;
+        }
     }
 }

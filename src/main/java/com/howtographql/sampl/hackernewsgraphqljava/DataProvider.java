@@ -34,5 +34,41 @@ public class DataProvider implements CommandLineRunner {
                 .url("http://graphql.org/learn/")
                 .description("The official docks")
                 .build());
+        linkRepository.save(Link
+                .builder()
+                .createdAt(NOW)
+                .url("http://url1.com")
+                .description("descr1")
+                .build());
+        linkRepository.save(Link
+                .builder()
+                .createdAt(NOW)
+                .url("http://url2")
+                .description("descr2")
+                .build());
+        linkRepository.save(Link
+                .builder()
+                .createdAt(NOW)
+                .url("http://url3.com")
+                .description("descr3")
+                .build());
+        linkRepository.save(Link
+                .builder()
+                .createdAt(NOW)
+                .url("http://url4")
+                .description("descr4")
+                .build());
+        linkRepository.save(Link
+                .builder()
+                .createdAt(NOW)
+                .url("http://url5.com")
+                .description("descr5")
+                .build());
+        linkRepository.save(Link
+                .builder()
+                .createdAt(NOW)
+                .url("http://url6")
+                .description("descr6")
+                .build());
     }
 }

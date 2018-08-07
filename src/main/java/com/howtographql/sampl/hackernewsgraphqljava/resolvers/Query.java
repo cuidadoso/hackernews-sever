@@ -29,8 +29,8 @@ public class Query implements GraphQLQueryResolver {
     private final VoteRepository voteRepository;
 
     // Link query resolvers
-    public List<Link> links(LinkFilter filter, int skip, int first, String orderBy) {
-        Pageable pageable = new PageRequest(skip, first, orders(orderBy, Link.class));
+    public List<Link> links(LinkFilter filter, int page, int size, String orderBy) {
+        Pageable pageable = new PageRequest(page, size, orders(orderBy, Link.class));
 
         if(filter != null && filter.getUrlContains() != null && filter.getDescriptionContains() != null) {
             return linkRepository.findAllByUrlContainsOrDescriptionContains(filter.getUrlContains(), filter.getDescriptionContains(), pageable);
@@ -51,8 +51,8 @@ public class Query implements GraphQLQueryResolver {
     }
 
     // User query resolvers
-    public List<User> users(String email, int skip, int first, String orderBy) {
-        Pageable pageable = new PageRequest(skip, first, orders(orderBy, User.class));
+    public List<User> users(String email, int page, int size, String orderBy) {
+        Pageable pageable = new PageRequest(page, size, orders(orderBy, User.class));
         if (!StringUtils.isBlank(email)) {
             // return makeList(userRepository.findAll(UserSpecifications.userByEmail(email)));
             return userRepository.findAllByEmailContains(email, pageable);
@@ -65,8 +65,8 @@ public class Query implements GraphQLQueryResolver {
     }
 
     // Vote query resolvers
-    public List<Vote> votes(Long userId, Long linkId, int skip, int first, String orderBy) {
-        Pageable pageable = new PageRequest(skip, first, orders(orderBy, Vote.class));
+    public List<Vote> votes(Long userId, Long linkId, int page, int size, String orderBy) {
+        Pageable pageable = new PageRequest(page, size, orders(orderBy, Vote.class));
         if (userId != null && linkId != null) {
             return voteRepository.findAllByUserIdAndLinkId(userId, linkId, pageable);
         }

@@ -4,11 +4,11 @@ schema {
 }
 
 type Query {
-    links(filter: LinkFilter = {}, skip: Int = 0, first: Int = 10, orderBy: String = "id_asc"): [Link]
+    links(filter: LinkFilter = {}, page: Int = 0, size: Int = 10, orderBy: String = "id_asc"): [Link]
     link(id: ID!): Link
-    users(email: String, skip: Int = 0, first: Int = 10, orderBy: String = "id_asc"): [User]
+    users(email: String, page: Int = 0, size: Int = 10, orderBy: String = "id_asc"): [User]
     user(id: ID!): User
-    votes(userId: ID, linkId: ID, skip: Int = 0, first: Int = 10, orderBy: String = "id_asc"): [Vote]
+    votes(userId: ID, linkId: ID, page: Int = 0, size: Int = 10, orderBy: String = "id_asc"): [Vote]
     vote(id: ID!): Vote
 }
 

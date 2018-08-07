@@ -99,7 +99,7 @@ public class Mutation implements GraphQLMutationResolver {
 
     public SigninPayload login(String email, String password) throws IllegalAccessException {
         User user = userRepository.findByEmail(email);
-        if (user.getPassword().equals(password)) {
+        if (user != null && user.getPassword().equals(password)) {
             // TODO replace with OAht2 + JWT implementation
             store.put("userId", user.getId());
             return new SigninPayload(user.getId(), user);

@@ -4,7 +4,7 @@ schema {
 }
 
 type Query {
-    links(filter: LinkFilter = {}, page: Int = 0, size: Int = 10, orderBy: String = "id_asc"): [Link]
+    links(filter: LinkFilter = {}, page: Int = 0, size: Int = 10, orderBy: String = "id_asc"): Links
     link(id: ID!): Link
     users(email: String, page: Int = 0, size: Int = 10, orderBy: String = "id_asc"): [User]
     user(id: ID!): User
@@ -64,4 +64,14 @@ scalar DateTime
 input LinkFilter {
     description_contains: String
     url_contains: String
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+}
+
+type Links {
+    items: [Link!]!
+    pageInfo: PageInfo!
 }

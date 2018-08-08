@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.time.ZoneOffset.UTC;
 
@@ -84,10 +86,11 @@ public class Mutation implements GraphQLMutationResolver {
                 .email(email)
                 .password(password)
                 .build());
+        store.put("userId", user.getId());
         return new SigninPayload(user.getId(), user);
     }
 
-    public SigninPayload signIn(AuthData auth) throws IllegalAccessException {
+    public SigninPayload signIn(AuthData auth) {
         User user = userRepository.findByEmail(auth.getEmail());
         if (user.getPassword().equals(auth.getPassword())) {
             // TODO replace with OAht2 + JWT implementation
@@ -97,7 +100,7 @@ public class Mutation implements GraphQLMutationResolver {
         throw new GraphQLException("Invalid credentials");
     }
 
-    public SigninPayload login(String email, String password) throws IllegalAccessException {
+    public SigninPayload login(String email, String password) {
         User user = userRepository.findByEmail(email);
         if (user != null && user.getPassword().equals(password)) {
             // TODO replace with OAht2 + JWT implementation
@@ -118,6 +121,13 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public Vote vote(Long linkId) {
+        List<Vote> votes = voteRepository.findAllByLinkId(linkId)
+                .stream()
+                .filter(vote -> vote.getUserId().equals(store.get("userId")))
+                .collect(Collectors.toList());
+        if (!votes.isEmpty()) {
+            return null;
+        }
         return voteRepository.save(Vote
                 .builder()
                 .createdAt(NOW)

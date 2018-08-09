@@ -1,6 +1,7 @@
 schema {
     query: Query
     mutation: Mutation
+    subscription : Subscription
 }
 
 type Query {
@@ -24,6 +25,10 @@ type Mutation {
     createVote(linkId: ID!, userId: ID!): Vote
     vote(linkId: ID!): Vote
     deleteVote(id: ID!): Boolean
+}
+
+type Subscription {
+    newLink: Link!
 }
 
 type Link {

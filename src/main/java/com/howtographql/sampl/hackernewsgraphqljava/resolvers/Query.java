@@ -4,6 +4,7 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.*;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,7 @@ import static com.howtographql.sampl.hackernewsgraphqljava.util.Collections.make
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
+@Log
 @Component
 @RequiredArgsConstructor
 public class Query implements GraphQLQueryResolver {
@@ -28,6 +30,7 @@ public class Query implements GraphQLQueryResolver {
 
     // Link query resolvers
     public Links links(LinkFilter filter, int page, int size, String orderBy) {
+        log.info("Query - links");
         Pageable pageable = new PageRequest(page, size, orders(orderBy, Link.class));
         Page<Link> links;
 
@@ -59,11 +62,13 @@ public class Query implements GraphQLQueryResolver {
     }
 
     public Link link(Long id) {
+        log.info("Query - link");
         return linkRepository.findOne(id);
     }
 
     // User query resolvers
     public List<User> users(String email, int page, int size, String orderBy) {
+        log.info("Query - users");
         Pageable pageable = new PageRequest(page, size, orders(orderBy, User.class));
         if (!StringUtils.isBlank(email)) {
             // return makeList(userRepository.findAll(UserSpecifications.userByEmail(email)));
@@ -73,11 +78,13 @@ public class Query implements GraphQLQueryResolver {
     }
 
     public User user(Long id) {
+        log.info("Query - user");
         return userRepository.findOne(id);
     }
 
     // Vote query resolvers
     public List<Vote> votes(Long userId, Long linkId, int page, int size, String orderBy) {
+        log.info("Query - votes");
         Pageable pageable = new PageRequest(page, size, orders(orderBy, Vote.class));
         if (userId != null && linkId != null) {
             return voteRepository.findAllByUserIdAndLinkId(userId, linkId, pageable);
@@ -92,6 +99,7 @@ public class Query implements GraphQLQueryResolver {
     }
 
     public Vote vote(Long id) {
+        log.info("Query - vote");
         return voteRepository.findOne(id);
     }
 

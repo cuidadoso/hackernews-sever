@@ -30,7 +30,6 @@ public class Query implements GraphQLQueryResolver {
 
     // Link query resolvers
     public Links links(LinkFilter filter, int page, int size, String orderBy) {
-        log.info("Query - links");
         Pageable pageable = new PageRequest(page, size, orders(orderBy, Link.class));
         Page<Link> links;
 
@@ -62,7 +61,6 @@ public class Query implements GraphQLQueryResolver {
     }
 
     public Link link(Long id) {
-        log.info("Query - link");
         return linkRepository.findOne(id);
     }
 

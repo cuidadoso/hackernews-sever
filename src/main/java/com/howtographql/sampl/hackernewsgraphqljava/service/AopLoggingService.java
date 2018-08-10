@@ -14,11 +14,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
-import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 
 @Log
 @Aspect
-@Order(LOWEST_PRECEDENCE)
+@Order()
 @Component
 public class AopLoggingService {
 
@@ -31,7 +30,7 @@ public class AopLoggingService {
      * @param links
      */
     @AfterReturning(
-            pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.LinkServiceImpl.findAll(..))",
+            pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService.findAll(..))",
             returning = "links"
     )
     public void onAfterLinks(final JoinPoint joinPoint, final Links links) {
@@ -45,7 +44,7 @@ public class AopLoggingService {
      * @param link
      */
     @AfterReturning(
-            pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.LinkServiceImpl.findOne(..))",
+            pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService.findOne(..))",
             returning = "link"
     )
     public void onAfterLink(final JoinPoint joinPoint, final Link link) {

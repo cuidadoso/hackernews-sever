@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 
 @Service("linkService")
 @Scope(proxyMode = ScopedProxyMode.INTERFACES)
-public class LinkServiceImpl extends AbstractService<Link> implements LinkService {
+public class LinksServiceImpl extends AbstractServiceHelper<Link> implements AbstractService {
     private final LinkRepository linkRepository;
 
-    public LinkServiceImpl(LinkRepository linkRepository) {
+    public LinksServiceImpl(LinkRepository linkRepository) {
         super(Link.class);
         this.linkRepository = linkRepository;
     }

@@ -7,4 +7,8 @@ public class UserSpecifications {
     public static BooleanExpression userByEmail(String email) {
         return QUser.user.email.contains(email);
     }
+
+    public static BooleanExpression userByName(String name) {
+        return QUser.user.name.contains(name);
+    }
 }

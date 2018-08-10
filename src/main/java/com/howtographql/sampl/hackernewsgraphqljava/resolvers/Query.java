@@ -3,11 +3,12 @@ package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.*;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.*;
-import com.howtographql.sampl.hackernewsgraphqljava.service.LinkService;
+import com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,7 +27,8 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @Component
 @RequiredArgsConstructor
 public class Query implements GraphQLQueryResolver {
-    private final LinkService linkService;
+    @Qualifier("linkService")
+    private final AbstractService linkService;
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
 

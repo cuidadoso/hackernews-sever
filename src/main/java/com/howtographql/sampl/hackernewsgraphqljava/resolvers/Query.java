@@ -3,10 +3,11 @@ package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.*;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.*;
+import com.howtographql.sampl.hackernewsgraphqljava.service.LinkService;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,7 +17,8 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import static com.howtographql.sampl.hackernewsgraphqljava.util.Collections.makeList;
+import static com.howtographql.sampl.hackernewsgraphqljava.repository.LinkSpecifications.linkByDescription;
+import static com.howtographql.sampl.hackernewsgraphqljava.repository.LinkSpecifications.linkByUrl;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -24,44 +26,26 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @Component
 @RequiredArgsConstructor
 public class Query implements GraphQLQueryResolver {
-    private final LinkRepository linkRepository;
+    private final LinkService linkService;
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
 
     // Link query resolvers
     public Links links(LinkFilter filter, int page, int size, String orderBy) {
-        Pageable pageable = new PageRequest(page, size, orders(orderBy, Link.class));
-        Page<Link> links;
-
+        BooleanExpression predicate = null;
         if(filter != null && filter.getUrlContains() != null && filter.getDescriptionContains() != null) {
-            links = linkRepository.findAllByUrlContainsOrDescriptionContains(filter.getUrlContains(), filter.getDescriptionContains(), pageable);
+            predicate = linkByUrl(filter.getUrlContains()).or(linkByDescription(filter.getUrlContains()));
         } else if(filter != null && filter.getUrlContains() != null) {
-            // return makeList(linkRepository.findAll(LinkSpecifications.linkByUrl(filter.getUrlContains())));
-            links = linkRepository.findAllByUrlContains(filter.getUrlContains(), pageable);
+            predicate = linkByUrl(filter.getUrlContains());
         } else if(filter != null && filter.getDescriptionContains() != null) {
-            // return makeList(linkRepository.findAll(LinkSpecifications.linkByDescription(filter.getDescriptionContains())));
-            links = linkRepository.findAllByDescriptionContains(filter.getDescriptionContains(), pageable);
-        } else {
-            links = linkRepository.findAll(pageable);
+            predicate = linkByDescription(filter.getDescriptionContains());
         }
-
-        int totalPages = links.getTotalPages();
-        int pageNumber = links.getNumber() + 1;
-
-        PageInfo pageInfo = PageInfo.builder()
-                .hasNextPage(pageNumber < totalPages)
-                .hasPreviousPage(pageNumber > 1)
-                .build();
-
-        return Links.builder()
-                .items(links.getContent())
-                .pageInfo(pageInfo)
-                .build();
+        return linkService.findAll(predicate, page, size, orderBy);
 
     }
 
     public Link link(Long id) {
-        return linkRepository.findOne(id);
+        return linkService.findOne(id);
     }
 
     // User query resolvers

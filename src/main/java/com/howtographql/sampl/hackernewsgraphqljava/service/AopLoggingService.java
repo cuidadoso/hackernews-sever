@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 
 @Log
@@ -30,11 +31,11 @@ public class AopLoggingService {
      * @param links
      */
     @AfterReturning(
-            pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.resolvers.Query.links(..))",
+            pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.LinkServiceImpl.findAll(..))",
             returning = "links"
     )
     public void onAfterLinks(final JoinPoint joinPoint, final Links links) {
-        log.info("Query - links");
+        logInfo("Query - links [%s]", links);
     }
 
     /**
@@ -44,10 +45,11 @@ public class AopLoggingService {
      * @param link
      */
     @AfterReturning(
-            pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.resolvers.Query.link(..))",
+            pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.LinkServiceImpl.findOne(..))",
             returning = "link"
     )
     public void onAfterLink(final JoinPoint joinPoint, final Link link) {
-        log.info("Query - link");
+        logInfo("Query - link [%s]", link);
     }
+
 }

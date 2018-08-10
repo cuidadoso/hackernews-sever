@@ -4,6 +4,7 @@ import com.howtographql.sampl.hackernewsgraphqljava.model.BaseEntity;
 import com.howtographql.sampl.hackernewsgraphqljava.model.PageInfo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
+import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 
 @RequiredArgsConstructor
@@ -26,21 +28,27 @@ public abstract class AbstractService<E extends BaseEntity> {
     }
 
     protected Sort orders(String orderBy) {
-        if (orderBy != null) {
+        if (!StringUtils.isBlank(orderBy) && isBaseEntity()) {
             String[] orderParams = orderBy.split("_");
+            String fieldName = orderParams[0];
             Direction direction = Direction.fromStringOrNull(orderParams[1]);
-            /*TODO validate sort field
-            try {
-                Field field = classOfEntity.getField(orderParams[0]);
-                return new Sort(new Order(direction == null ? ASC : direction, field.getName()));
-            } catch (NoSuchFieldException e) {
-                logInfo("Field not exists.");
-                return new Sort(new Order(direction == null ? ASC : direction, "id"));
-            }*/
-            return new Sort(new Order(direction == null ? ASC : direction, orderParams[0]));
-        } else {
-            return null;
+            switch (fieldName) {
+                case "id":
+                case "createdAt":
+                    return new Sort(new Order(direction == null ? ASC : direction, fieldName));
+                default:
+                    try {
+                        // Just to check if classOfEntity contains field with name = fieldName
+                        classOfEntity. getDeclaredField(fieldName);
+                        return new Sort(new Order(direction == null ? ASC : direction, fieldName));
+                    } catch (NoSuchFieldException e) {
+                        logInfo("Field not exists.");
+                        // Default sort by id
+                        return new Sort(new Order(ASC, "id"));
+                    }
+            }
         }
+        return null;
     }
 
     protected PageInfo pageInfo(Page<E> entities) {
@@ -50,5 +58,9 @@ public abstract class AbstractService<E extends BaseEntity> {
                 .hasNextPage(pageNumber < totalPages)
                 .hasPreviousPage(pageNumber > 1)
                 .build();
+    }
+
+    private boolean isBaseEntity() {
+        return BaseEntity.class.equals(classOfEntity.getSuperclass());
     }
 }

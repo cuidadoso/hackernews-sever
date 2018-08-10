@@ -31,8 +31,8 @@ type Subscription {
     newLink: Link!
 }
 
-type Link {
-    id: ID!
+type Link implements Obj {
+    id: ID!,
     createdAt: DateTime!
     url: String!
     description: String
@@ -40,8 +40,9 @@ type Link {
     votes: [Vote]
 }
 
-type User {
+type User implements Obj {
     id: ID!
+    createdAt: DateTime!
     name: String!
     email: String
     password: String
@@ -57,7 +58,7 @@ type SigninPayload {
     user: User
 }
 
-type Vote {
+type Vote implements Obj {
     id: ID!
     createdAt: DateTime!
     user: User!
@@ -79,4 +80,9 @@ type PageInfo {
 type Links {
     items: [Link!]!
     pageInfo: PageInfo!
+}
+
+interface Obj {
+    id: ID!,
+    createdAt: DateTime!
 }

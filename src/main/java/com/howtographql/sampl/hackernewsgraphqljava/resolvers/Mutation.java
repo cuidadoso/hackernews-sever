@@ -5,20 +5,15 @@ import com.howtographql.sampl.hackernewsgraphqljava.model.*;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.LinkRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.UserRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.VoteRepository;
+import com.howtographql.sampl.hackernewsgraphqljava.service.SessionService;
 import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-
-import static java.time.ZoneOffset.UTC;
 
 @Log
 @Component
@@ -27,11 +22,7 @@ public class Mutation implements GraphQLMutationResolver {
     private final LinkRepository linkRepository;
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
-
-    @Resource(name = "store")
-    private Map<String, Object> store;
-
-    private static final ZonedDateTime NOW = Instant.now().atZone(UTC);
+    private final SessionService sessionService;
 
     // Link mutation resolvers
     public Link createLink(String url, String description, DataFetchingEnvironment env) {
@@ -39,10 +30,9 @@ public class Mutation implements GraphQLMutationResolver {
         AuthContext context = env.getContext();
         return linkRepository.save(Link
                 .builder()
-                .createdAt(NOW)
                 .url(url)
                 .description(description)
-                .userId((Long) store.get("userId"))
+                .userId(sessionService.userId())
                 //.userId(context.getUser().getId())
                 .build());
     }
@@ -94,7 +84,7 @@ public class Mutation implements GraphQLMutationResolver {
                 .email(email)
                 .password(password)
                 .build());
-        store.put("userId", user.getId());
+        sessionService.saveUserId(user.getId());
         return new SigninPayload(user.getId(), user);
     }
 
@@ -103,7 +93,7 @@ public class Mutation implements GraphQLMutationResolver {
         User user = userRepository.findByEmail(auth.getEmail());
         if (user.getPassword().equals(auth.getPassword())) {
             // TODO replace with OAht2 + JWT implementation
-            store.put("userId", user.getId());
+            sessionService.saveUserId(user.getId());
             return new SigninPayload(user.getId(), user);
         }
         throw new GraphQLException("Invalid credentials");
@@ -114,7 +104,7 @@ public class Mutation implements GraphQLMutationResolver {
         User user = userRepository.findByEmail(email);
         if (user != null && user.getPassword().equals(password)) {
             // TODO replace with OAht2 + JWT implementation
-            store.put("userId", user.getId());
+            sessionService.saveUserId(user.getId());
             return new SigninPayload(user.getId(), user);
         }
         throw new GraphQLException("Invalid credentials");
@@ -125,7 +115,6 @@ public class Mutation implements GraphQLMutationResolver {
         log.info("Mutation - createVote");
         return voteRepository.save(Vote
                 .builder()
-                .createdAt(NOW)
                 .userId(userId)
                 .linkId(linkId)
                 .build());
@@ -135,15 +124,14 @@ public class Mutation implements GraphQLMutationResolver {
         log.info("Mutation - vote");
         List<Vote> votes = voteRepository.findAllByLinkId(linkId)
                 .stream()
-                .filter(vote -> vote.getUserId().equals(store.get("userId")))
+                .filter(vote -> vote.getUserId().equals(sessionService.userId()))
                 .collect(Collectors.toList());
         if (!votes.isEmpty()) {
             return null;
         }
         return voteRepository.save(Vote
                 .builder()
-                .createdAt(NOW)
-                .userId((Long) store.get("userId"))
+                .userId(sessionService.userId())
                 .linkId(linkId)
                 .build());
     }

@@ -1,74 +1,76 @@
 package com.howtographql.sampl.hackernewsgraphqljava;
 
 import com.howtographql.sampl.hackernewsgraphqljava.model.Link;
+import com.howtographql.sampl.hackernewsgraphqljava.model.User;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.LinkRepository;
+import com.howtographql.sampl.hackernewsgraphqljava.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.ZonedDateTime;
-
-import static java.time.ZoneOffset.UTC;
-
 @Component
 @RequiredArgsConstructor
 public class DataProvider implements CommandLineRunner {
     private final LinkRepository linkRepository;
-
-    private static final ZonedDateTime NOW = Instant.now().atZone(UTC);
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
     public void run(String... strings) throws Exception {
+        Long userId = userRepository.save(User.builder()
+                .name("name")
+                .email("email")
+                .password("pass")
+                .build())
+                .getId();
         linkRepository.save(Link
                 .builder()
-                .createdAt(NOW)
                 .url("http://howtographql.com")
                 .description("Your favorite GraphQL page")
+                .userId(userId)
                 .build());
         linkRepository.save(Link
                 .builder()
-                .createdAt(NOW)
                 .url("http://graphql.org/learn/")
                 .description("The official docks")
+                .userId(userId)
                 .build());
         linkRepository.save(Link
                 .builder()
-                .createdAt(NOW)
                 .url("http://url1.com")
                 .description("descr1")
+                .userId(userId)
                 .build());
         linkRepository.save(Link
                 .builder()
-                .createdAt(NOW)
                 .url("http://url2")
                 .description("descr2")
+                .userId(userId)
                 .build());
         linkRepository.save(Link
                 .builder()
-                .createdAt(NOW)
                 .url("http://url3.com")
                 .description("descr3")
+                .userId(userId)
                 .build());
         linkRepository.save(Link
                 .builder()
-                .createdAt(NOW)
                 .url("http://url4")
                 .description("descr4")
+                .userId(userId)
                 .build());
         linkRepository.save(Link
                 .builder()
-                .createdAt(NOW)
                 .url("http://url5.com")
                 .description("descr5")
+                .userId(userId)
                 .build());
         linkRepository.save(Link
                 .builder()
-                .createdAt(NOW)
                 .url("http://url6")
                 .description("descr6")
+                .userId(userId)
                 .build());
     }
 }

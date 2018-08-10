@@ -10,4 +10,5 @@ import lombok.RequiredArgsConstructor;
 public class PageInfo {
     private final boolean hasNextPage;
     private final boolean hasPreviousPage;
+    private final Long total;
 }

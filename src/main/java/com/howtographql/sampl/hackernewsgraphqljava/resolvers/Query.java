@@ -42,12 +42,12 @@ public class Query implements GraphQLQueryResolver {
         } else if(filter != null && filter.getDescriptionContains() != null) {
             predicate = linkByDescription(filter.getDescriptionContains());
         }
-        return linkService.findAll(predicate, page, size, orderBy);
+        return (Links) linkService.findAll(predicate, page, size, orderBy);
 
     }
 
     public Link link(Long id) {
-        return linkService.findOne(id);
+        return (Link) linkService.findOne(id);
     }
 
     // User query resolvers

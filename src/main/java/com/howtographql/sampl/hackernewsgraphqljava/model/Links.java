@@ -1,15 +1,9 @@
 package com.howtographql.sampl.hackernewsgraphqljava.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 
-@Getter
-@RequiredArgsConstructor
-@Builder
-public class Links {
-    private final List<Link> items;
-    private final PageInfo pageInfo;
+public class Links extends BaseEntities<Link>{
+    public Links(List<Link> items, PageInfo pageInfo) {
+        super(items, pageInfo);
+    }
 }

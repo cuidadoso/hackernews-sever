@@ -1,15 +1,11 @@
 package com.howtographql.sampl.hackernewsgraphqljava.service;
 
-import com.howtographql.sampl.hackernewsgraphqljava.model.Link;
-import com.howtographql.sampl.hackernewsgraphqljava.model.LinkFilter;
-import com.howtographql.sampl.hackernewsgraphqljava.model.Links;
+import com.howtographql.sampl.hackernewsgraphqljava.model.*;
 import com.howtographql.sampl.hackernewsgraphqljava.resolvers.Query;
 import lombok.extern.java.Log;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -21,34 +17,40 @@ import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 @Component
 public class AopLoggingService {
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     /**
      * Validator/logger for {@link Query#links(LinkFilter, int, int, String)}
      *
      * @param joinPoint
-     * @param links
+     * @param entities
      */
     @AfterReturning(
             pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService.findAll(..))",
-            returning = "links"
+            returning = "entities"
     )
-    public void onAfterLinks(final JoinPoint joinPoint, final Links links) {
-        logInfo("Query - links [%s]", links);
+    public void onAfterLinks(final JoinPoint joinPoint, final BaseEntities entities) {
+        logInfo("Find all entities of %s. Total count of entities is %d.",
+                entityName(joinPoint),
+                entities.getPageInfo().getTotal());
     }
 
     /**
      * Validator/logger for {@link Query#link(Long)}
      *
      * @param joinPoint
-     * @param link
+     * @param entity
      */
     @AfterReturning(
             pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService.findOne(..))",
-            returning = "link"
+            returning = "entity"
     )
-    public void onAfterLink(final JoinPoint joinPoint, final Link link) {
-        logInfo("Query - link [%s]", link);
+    public void onAfterLink(final JoinPoint joinPoint, final BaseEntity entity) {
+        logInfo("Find one entity %s with id - link [%d]",
+                entityName(joinPoint), entity.getId());
+    }
+
+    private String entityName(final JoinPoint joinPoint) {
+        AbstractServiceHelper target = (AbstractServiceHelper) joinPoint.getTarget();
+        return target.getClassOfEntity().getSimpleName();
     }
 
 }

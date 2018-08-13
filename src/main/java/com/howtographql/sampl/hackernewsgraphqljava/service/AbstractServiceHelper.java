@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort.Order;
 
 import java.util.List;
 
+import static com.howtographql.sampl.hackernewsgraphqljava.util.Collections.makeList;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logError;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 import static org.springframework.data.domain.Sort.Direction.ASC;
@@ -31,6 +32,11 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
     @Override
     public Entity findOne(Long id) {
         return repository.findOne(id);
+    }
+
+    public List<Entity> findAll(BooleanExpression predicate) {
+        Iterable<Entity> entities = repository.findAll(predicate);
+        return makeList(entities);
     }
 
     public Entities findAll(BooleanExpression predicate, int page, int size, String orderBy) {

@@ -20,6 +20,7 @@ import java.util.List;
 
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.LinkSpecifications.linkByDescription;
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.LinkSpecifications.linkByUrl;
+import static com.howtographql.sampl.hackernewsgraphqljava.specifications.UserSpecifications.userByEmail;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -29,7 +30,8 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 public class Query implements GraphQLQueryResolver {
     @Qualifier("linkService")
     private final AbstractService linkService;
-    private final UserRepository userRepository;
+    @Qualifier("userService")
+    private final AbstractService userService;
     private final VoteRepository voteRepository;
 
     // Link query resolvers
@@ -51,19 +53,17 @@ public class Query implements GraphQLQueryResolver {
     }
 
     // User query resolvers
-    public List<User> users(String email, int page, int size, String orderBy) {
-        log.info("Query - users");
-        Pageable pageable = new PageRequest(page, size, orders(orderBy, User.class));
+    public Users users(String email, int page, int size, String orderBy) {
+        BooleanExpression predicate = null;
         if (!StringUtils.isBlank(email)) {
-            // return makeList(userRepository.findAll(UserSpecifications.userByEmail(email)));
-            return userRepository.findAllByEmailContains(email, pageable);
+            predicate = userByEmail(email);
         }
-        return userRepository.findAll(pageable).getContent();
+
+        return (Users) userService.findAll(predicate, page, size, orderBy);
     }
 
     public User user(Long id) {
-        log.info("Query - user");
-        return userRepository.findOne(id);
+        return (User) userService.findOne(id);
     }
 
     // Vote query resolvers

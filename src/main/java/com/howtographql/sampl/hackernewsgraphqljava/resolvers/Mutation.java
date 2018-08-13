@@ -2,8 +2,6 @@ package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.*;
-import com.howtographql.sampl.hackernewsgraphqljava.repository.LinkRepository;
-import com.howtographql.sampl.hackernewsgraphqljava.repository.UserRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.VoteRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService;
 import com.howtographql.sampl.hackernewsgraphqljava.service.SessionService;
@@ -17,19 +15,21 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.howtographql.sampl.hackernewsgraphqljava.specifications.UserSpecifications.userByEmail;
+
 @Log
 @Component
 @RequiredArgsConstructor
 public class Mutation implements GraphQLMutationResolver {
     @Qualifier("linkService")
     private final AbstractService linkService;
-    private final UserRepository userRepository;
+    @Qualifier("userService")
+    private final AbstractService userService;
     private final VoteRepository voteRepository;
     private final SessionService sessionService;
 
     // Link mutation resolvers
     public Link createLink(String url, String description, DataFetchingEnvironment env) {
-        log.info("Mutation - createLink");
         AuthContext context = env.getContext();
         return (Link) linkService.save(Link
                 .builder()
@@ -41,7 +41,6 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public boolean deleteLink(Long id) {
-        log.info("Mutation - deleteLink");
         if (linkService.exists(id)) {
             linkService.delete(id);
             return true;
@@ -51,8 +50,7 @@ public class Mutation implements GraphQLMutationResolver {
 
     // User mutation resolvers
     public User createUser(String name, String email, String password) {
-        log.info("Mutation - createUser");
-        return userRepository.save(User
+        return (User) userService.save(User
                 .builder()
                 .name(name)
                 .email(email)
@@ -61,17 +59,15 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public boolean deleteUset(Long id) {
-        log.info("Mutation - deleteUser");
-        if (userRepository.exists(id)) {
-            userRepository.delete(id);
+        if (userService.exists(id)) {
+            userService.delete(id);
             return true;
         }
         throw new GraphQLException("User not exists");
     }
 
     public User createUserAuth(String name, AuthData authData) {
-        log.info("Mutation - createUserAuth");
-        return userRepository.save(User
+        return (User) userService.save(User
                 .builder()
                 .name(name)
                 .email(authData.getEmail())
@@ -80,8 +76,7 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public SigninPayload signUp(String name, String email, String password) {
-        log.info("Mutation - signUp");
-        User user = userRepository.save(User
+        User user = (User) userService.save(User
                 .builder()
                 .name(name)
                 .email(email)
@@ -90,23 +85,21 @@ public class Mutation implements GraphQLMutationResolver {
         sessionService.saveUserId(user.getId());
         return new SigninPayload(user.getId(), user);
     }
-
+    // TODO replace with OAht2 + JWT implementation
     public SigninPayload signIn(AuthData auth) {
-        log.info("Mutation - signIn");
-        User user = userRepository.findByEmail(auth.getEmail());
-        if (user.getPassword().equals(auth.getPassword())) {
-            // TODO replace with OAht2 + JWT implementation
+        List<User> users = userService.findAll(userByEmail(auth.getEmail()));
+        if (!users.isEmpty() && users.get(0).getPassword().equals(auth.getPassword())) {
+            User user = users.get(0);
             sessionService.saveUserId(user.getId());
             return new SigninPayload(user.getId(), user);
         }
         throw new GraphQLException("Invalid credentials");
     }
-
+    // TODO replace with OAht2 + JWT implementation
     public SigninPayload login(String email, String password) {
-        log.info("Mutation - login");
-        User user = userRepository.findByEmail(email);
-        if (user != null && user.getPassword().equals(password)) {
-            // TODO replace with OAht2 + JWT implementation
+        List<User> users = userService.findAll(userByEmail(email));
+        if (!users.isEmpty() && users.get(0).getPassword().equals(password)) {
+            User user = users.get(0);
             sessionService.saveUserId(user.getId());
             return new SigninPayload(user.getId(), user);
         }

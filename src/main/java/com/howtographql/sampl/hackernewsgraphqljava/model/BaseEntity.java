@@ -1,15 +1,13 @@
 package com.howtographql.sampl.hackernewsgraphqljava.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Getter
 @Setter
+@ToString(exclude = "createdAt")
 @MappedSuperclass
 @EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor

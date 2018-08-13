@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 @Entity
 @Getter
 @Builder
+@ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Link extends BaseEntity {

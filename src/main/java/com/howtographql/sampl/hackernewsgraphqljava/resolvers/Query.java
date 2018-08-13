@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import static com.howtographql.sampl.hackernewsgraphqljava.repository.LinkSpecifications.linkByDescription;
-import static com.howtographql.sampl.hackernewsgraphqljava.repository.LinkSpecifications.linkByUrl;
+import static com.howtographql.sampl.hackernewsgraphqljava.specifications.LinkSpecifications.linkByDescription;
+import static com.howtographql.sampl.hackernewsgraphqljava.specifications.LinkSpecifications.linkByUrl;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 

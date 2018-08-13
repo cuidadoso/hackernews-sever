@@ -5,11 +5,13 @@ import com.howtographql.sampl.hackernewsgraphqljava.model.*;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.LinkRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.UserRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.VoteRepository;
+import com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService;
 import com.howtographql.sampl.hackernewsgraphqljava.service.SessionService;
 import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,7 +21,8 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class Mutation implements GraphQLMutationResolver {
-    private final LinkRepository linkRepository;
+    @Qualifier("linkService")
+    private final AbstractService linkService;
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
     private final SessionService sessionService;
@@ -28,7 +31,7 @@ public class Mutation implements GraphQLMutationResolver {
     public Link createLink(String url, String description, DataFetchingEnvironment env) {
         log.info("Mutation - createLink");
         AuthContext context = env.getContext();
-        return linkRepository.save(Link
+        return (Link) linkService.save(Link
                 .builder()
                 .url(url)
                 .description(description)
@@ -39,8 +42,8 @@ public class Mutation implements GraphQLMutationResolver {
 
     public boolean deleteLink(Long id) {
         log.info("Mutation - deleteLink");
-        if (linkRepository.exists(id)) {
-            linkRepository.delete(id);
+        if (linkService.exists(id)) {
+            linkService.delete(id);
             return true;
         }
         throw new GraphQLException("Link not exists");

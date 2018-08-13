@@ -1,4 +1,4 @@
-package com.howtographql.sampl.hackernewsgraphqljava.repository;
+package com.howtographql.sampl.hackernewsgraphqljava.specifications;
 
 import com.howtographql.sampl.hackernewsgraphqljava.model.QUser;
 import com.querydsl.core.types.dsl.BooleanExpression;

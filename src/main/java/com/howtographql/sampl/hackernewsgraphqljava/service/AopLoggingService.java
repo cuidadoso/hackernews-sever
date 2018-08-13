@@ -20,14 +20,14 @@ public class AopLoggingService {
     /**
      * Validator/logger for {@link Query#links(LinkFilter, int, int, String)}
      *
-     * @param joinPoint
-     * @param entities
+     * @param joinPoint Join point object
+     * @param entities  List od entities with page info.
      */
     @AfterReturning(
             pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService.findAll(..))",
             returning = "entities"
     )
-    public void onAfterLinks(final JoinPoint joinPoint, final BaseEntities entities) {
+    public void onAfterFindAll(final JoinPoint joinPoint, final BaseEntities entities) {
         logInfo("Find all entities of %s. Total count of entities is %d.",
                 entityName(joinPoint),
                 entities.getPageInfo().getTotal());
@@ -36,16 +36,44 @@ public class AopLoggingService {
     /**
      * Validator/logger for {@link Query#link(Long)}
      *
-     * @param joinPoint
-     * @param entity
+     * @param joinPoint Join point object
+     * @param entity    Entity.
      */
     @AfterReturning(
             pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService.findOne(..))",
             returning = "entity"
     )
-    public void onAfterLink(final JoinPoint joinPoint, final BaseEntity entity) {
-        logInfo("Find one entity %s with id - link [%d]",
+    public void onAfterFindOne(final JoinPoint joinPoint, final BaseEntity entity) {
+        logInfo("Find one entity %s with id [%d]",
                 entityName(joinPoint), entity.getId());
+    }
+
+    /**
+     * Validator/logger for {@link Query#link(Long)}
+     *
+     * @param joinPoint Join point object
+     * @param entity    Entity.
+     */
+    @AfterReturning(
+            pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService.save(..))",
+            returning = "entity"
+    )
+    public void onAfterSave(final JoinPoint joinPoint, final BaseEntity entity) {
+        logInfo("Save entity [%s] - [%s]",
+                entityName(joinPoint), entity.toString());
+    }
+
+    /**
+     * Validator/logger for {@link Query#link(Long)}
+     *
+     * @param joinPoint Join point object
+     */
+    @AfterReturning(
+            pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService.delete(..))"
+    )
+    public void onAfterDelete(final JoinPoint joinPoint) {
+        Long id = deleteArguments(joinPoint);
+        logInfo("Delete entity with ID [%d]", id);
     }
 
     private String entityName(final JoinPoint joinPoint) {
@@ -53,4 +81,11 @@ public class AopLoggingService {
         return target.getClassOfEntity().getSimpleName();
     }
 
+    private Long deleteArguments(final JoinPoint joinPoint) {
+        Object arg = joinPoint.getArgs()[0];
+        if (arg instanceof BaseEntity) {
+            return ((BaseEntity) arg).getId();
+        }
+        return (Long) arg;
+    }
 }

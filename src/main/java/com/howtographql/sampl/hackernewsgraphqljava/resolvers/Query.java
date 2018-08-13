@@ -2,27 +2,19 @@ package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.*;
-import com.howtographql.sampl.hackernewsgraphqljava.repository.*;
 import com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Field;
-import java.util.List;
 
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.LinkSpecifications.linkByDescription;
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.LinkSpecifications.linkByUrl;
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.UserSpecifications.userByEmail;
-import static org.springframework.data.domain.Sort.Direction.ASC;
-import static org.springframework.data.domain.Sort.Direction.DESC;
+import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSpecifications.voteByLink;
+import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSpecifications.voteByUser;
 
 @Log
 @Component
@@ -32,7 +24,8 @@ public class Query implements GraphQLQueryResolver {
     private final AbstractService linkService;
     @Qualifier("userService")
     private final AbstractService userService;
-    private final VoteRepository voteRepository;
+    @Qualifier("voteService")
+    private final AbstractService voteService;
 
     // Link query resolvers
     public Links links(LinkFilter filter, int page, int size, String orderBy) {
@@ -67,39 +60,20 @@ public class Query implements GraphQLQueryResolver {
     }
 
     // Vote query resolvers
-    public List<Vote> votes(Long userId, Long linkId, int page, int size, String orderBy) {
-        log.info("Query - votes");
-        Pageable pageable = new PageRequest(page, size, orders(orderBy, Vote.class));
+    public Votes votes(Long userId, Long linkId, int page, int size, String orderBy) {
+        BooleanExpression predicate = null;
+
         if (userId != null && linkId != null) {
-            return voteRepository.findAllByUserIdAndLinkId(userId, linkId, pageable);
+            predicate = voteByLink(linkId).and(voteByUser(userId));
+        } else if (userId != null) {
+            predicate = voteByUser(userId);
+        } else if (linkId != null) {
+            predicate = voteByLink(linkId);
         }
-        if (userId != null) {
-            return voteRepository.findAllByUserId(userId, pageable);
-        }
-        if (linkId != null) {
-            return voteRepository.findAllByLinkId(linkId, pageable);
-        }
-        return voteRepository.findAll(pageable).getContent();
+        return (Votes) voteService.findAll(predicate, page, size, orderBy);
     }
 
     public Vote vote(Long id) {
-        log.info("Query - vote");
-        return voteRepository.findOne(id);
-    }
-
-    private Sort orders(String orderBy, Class clazz) {
-        if (orderBy != null) {
-            String[] orderParams = orderBy.split("_");
-            Direction direction = Direction.fromStringOrNull(orderParams[1]);
-            try {
-                Field field = clazz.getField(orderParams[0]);
-                return new Sort(new Sort.Order(direction == null ? ASC : DESC, field.getName()));
-            } catch (NoSuchFieldException e) {
-                // TODO logging
-                return new Sort(new Sort.Order(direction == null ? ASC : DESC, "id"));
-            }
-        } else {
-            return null;
-        }
+        return (Vote) voteService.findOne(id);
     }
 }

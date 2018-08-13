@@ -2,7 +2,6 @@ package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.*;
-import com.howtographql.sampl.hackernewsgraphqljava.repository.VoteRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService;
 import com.howtographql.sampl.hackernewsgraphqljava.service.SessionService;
 import graphql.GraphQLException;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.UserSpecifications.userByEmail;
+import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSpecifications.voteByLink;
 
 @Log
 @Component
@@ -25,7 +25,8 @@ public class Mutation implements GraphQLMutationResolver {
     private final AbstractService linkService;
     @Qualifier("userService")
     private final AbstractService userService;
-    private final VoteRepository voteRepository;
+    @Qualifier("voteService")
+    private final AbstractService voteService;
     private final SessionService sessionService;
 
     // Link mutation resolvers
@@ -108,8 +109,7 @@ public class Mutation implements GraphQLMutationResolver {
 
     // Vote mutation resolvers
     public Vote createVote(Long linkId, Long userId) {
-        log.info("Mutation - createVote");
-        return voteRepository.save(Vote
+        return (Vote) voteService.save(Vote
                 .builder()
                 .userId(userId)
                 .linkId(linkId)
@@ -117,15 +117,15 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public Vote vote(Long linkId) {
-        log.info("Mutation - vote");
-        List<Vote> votes = voteRepository.findAllByLinkId(linkId)
+        List<Vote> all = voteService.findAll(voteByLink(linkId));
+        List<Vote> votes = all
                 .stream()
                 .filter(vote -> vote.getUserId().equals(sessionService.userId()))
                 .collect(Collectors.toList());
         if (!votes.isEmpty()) {
             return null;
         }
-        return voteRepository.save(Vote
+        return (Vote) voteService.save(Vote
                 .builder()
                 .userId(sessionService.userId())
                 .linkId(linkId)
@@ -133,9 +133,8 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public boolean deleteVote(Long id) {
-        log.info("Mutation - deleteVote");
-        if (voteRepository.exists(id)) {
-            voteRepository.delete(id);
+        if (voteService.exists(id)) {
+            voteService.delete(id);
             return true;
         }
         throw new GraphQLException("Vote not exists");

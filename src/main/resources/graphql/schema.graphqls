@@ -9,7 +9,7 @@ type Query {
     link(id: ID!): Link
     users(email: String, page: Int = 0, size: Int = 10, orderBy: String = "id_asc"): Users
     user(id: ID!): User
-    votes(userId: ID, linkId: ID, page: Int = 0, size: Int = 10, orderBy: String = "id_asc"): [Vote]
+    votes(userId: ID, linkId: ID, page: Int = 0, size: Int = 10, orderBy: String = "id_asc"): Votes
     vote(id: ID!): Vote
 }
 
@@ -84,6 +84,11 @@ type Links {
 
 type Users {
     items: [User!]!
+    pageInfo: PageInfo!
+}
+
+type Votes {
+    items: [Vote!]!
     pageInfo: PageInfo!
 }
 

@@ -1,6 +1,8 @@
 package com.howtographql.sampl.hackernewsgraphqljava.service;
 
-import com.howtographql.sampl.hackernewsgraphqljava.model.*;
+import com.howtographql.sampl.hackernewsgraphqljava.model.BaseEntities;
+import com.howtographql.sampl.hackernewsgraphqljava.model.BaseEntity;
+import com.howtographql.sampl.hackernewsgraphqljava.model.PageInfo;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.BaseRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import graphql.GraphQLException;
@@ -16,7 +18,9 @@ import org.springframework.data.domain.Sort.Order;
 
 import java.util.List;
 
+import static com.howtographql.sampl.hackernewsgraphqljava.configurations.SpringBeanUtils.session;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Collections.makeList;
+import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.NOW;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logError;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 import static org.springframework.data.domain.Sort.Direction.ASC;
@@ -51,12 +55,14 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
 
     @Override
     public void delete(Entity entity) {
-        repository.delete(entity);
+        entity.setDeletedAt(NOW);
+        entity.setUpdatedBy(session().userId());
+        repository.save(entity);
     }
 
     @Override
     public void delete(Long id) {
-        repository.delete(id);
+        delete(repository.findOne(id));
     }
 
     @Override

@@ -9,6 +9,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.howtographql.sampl.hackernewsgraphqljava.configurations.SpringBeanUtils.session;
+import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.NOW;
+
 @Component
 @RequiredArgsConstructor
 public class DataProvider implements CommandLineRunner {
@@ -18,6 +21,7 @@ public class DataProvider implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... strings) throws Exception {
+        session().saveUserId(1L);
         Long userId = userRepository.save(User.builder()
                 .name("name")
                 .email("email")
@@ -72,5 +76,13 @@ public class DataProvider implements CommandLineRunner {
                 .description("descr6")
                 .userId(userId)
                 .build());
+        Link deleted = Link.builder()
+                .url("http://urlDeleted")
+                .description("deleted")
+                .userId(userId)
+                .build();
+        deleted.setDeletedBy(1L);
+        deleted.setDeletedAt(NOW);
+        linkRepository.save(deleted);
     }
 }

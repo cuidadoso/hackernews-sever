@@ -4,7 +4,6 @@ import com.coxautodev.graphql.tools.GraphQLResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.Link;
 import com.howtographql.sampl.hackernewsgraphqljava.model.User;
 import com.howtographql.sampl.hackernewsgraphqljava.model.Vote;
-import com.howtographql.sampl.hackernewsgraphqljava.repository.VoteRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,8 +21,6 @@ public class LinkResolver implements GraphQLResolver<Link> {
     @Qualifier("voteService")
     private final AbstractService voteService;
 
-    private final VoteRepository voteRepository;
-
     public User postedBy(Link link) {
         if (link.getUserId() == null) {
             return null;
@@ -31,6 +28,28 @@ public class LinkResolver implements GraphQLResolver<Link> {
         return (User) userService.findOne(link.getUserId());
     }
 
+    public User createdBy(Link link) {
+        if (link.getCreatedBy() == null) {
+            return null;
+        }
+        return (User) userService.findOne(link.getCreatedBy());
+    }
+
+    public User updatedBy(Link link) {
+        if (link.getUpdatedBy() == null) {
+            return null;
+        }
+        return (User) userService.findOne(link.getUpdatedBy());
+    }
+
+    public User deletedBy(Link link) {
+        if (link.getDeletedBy() == null) {
+            return null;
+        }
+        return (User) userService.findOne(link.getDeletedBy());
+    }
+
+    @SuppressWarnings("unchecked")
     public List<Vote> votes(Link link) {
         return voteService.findAll(voteByLink(link.getId()));
     }

@@ -34,6 +34,11 @@ type Subscription {
 type Link implements Obj {
     id: ID!,
     createdAt: DateTime!
+    createdBy: User!
+    updatedAt: DateTime!
+    updatedBy: User!
+    deletedAt: DateTime
+    deletedBy: User
     url: String!
     description: String
     postedBy: User
@@ -43,6 +48,11 @@ type Link implements Obj {
 type User implements Obj {
     id: ID!
     createdAt: DateTime!
+    createdBy: User!
+    updatedAt: DateTime!
+    updatedBy: User!
+    deletedAt: DateTime
+    deletedBy: User
     name: String!
     email: String
     password: String
@@ -61,6 +71,11 @@ type SigninPayload {
 type Vote implements Obj {
     id: ID!
     createdAt: DateTime!
+    createdBy: User!
+    updatedAt: DateTime!
+    updatedBy: User!
+    deletedAt: DateTime
+    deletedBy: User
     user: User!
     link: Link!
 }
@@ -95,4 +110,9 @@ type Votes {
 interface Obj {
     id: ID!,
     createdAt: DateTime!
+    createdBy: User!
+    updatedAt: DateTime!
+    updatedBy: User!
+    deletedAt: DateTime
+    deletedBy: User
 }

@@ -1,11 +1,14 @@
 package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 
 import com.howtographql.sampl.hackernewsgraphqljava.model.User;
-import com.howtographql.sampl.hackernewsgraphqljava.repository.UserRepository;
 import com.howtographql.sampl.hackernewsgraphqljava.resolvers.exceptions.ErrorHandler;
+import com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService;
 import graphql.schema.GraphQLSchema;
-import graphql.servlet.*;
+import graphql.servlet.GraphQLContext;
+import graphql.servlet.GraphQLErrorHandler;
+import graphql.servlet.SimpleGraphQLServlet;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,14 +17,15 @@ import java.util.Optional;
 
 @Component
 public class EndPoint extends SimpleGraphQLServlet {
-    private final UserRepository userRepository;
+    @Qualifier("userService")
+    private final AbstractService userService;
     private final ErrorHandler errorHandler;
 
     public EndPoint(GraphQLSchema schema,
-                    UserRepository userRepository,
+                    AbstractService userService,
                     ErrorHandler errorHandler) {
         super(schema);
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.errorHandler = errorHandler;
     }
 
@@ -33,11 +37,11 @@ public class EndPoint extends SimpleGraphQLServlet {
                 .map(id -> id.replace("Bearer ", ""))
                 .map(id -> {
                     if (StringUtils.isNumeric(id)) {
-                        return userRepository.findOne(Long.parseLong(id));
+                        return (User) userService.findOne(Long.parseLong(id));
                     }
-                    return userRepository.findOne(1L);
+                    return (User) userService.findOne(1L);
                 })
-                .orElse(userRepository.findOne(1L));
+                .orElse((User) userService.findOne(1L));
         return new AuthContext(user, request, response);
     }
 

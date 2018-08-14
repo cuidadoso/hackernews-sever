@@ -31,7 +31,7 @@ type Subscription {
     newLink: Link!
 }
 
-type Link implements Obj {
+type Link implements BaseEntity {
     id: ID!,
     createdAt: DateTime!
     createdBy: User!
@@ -45,7 +45,7 @@ type Link implements Obj {
     votes: [Vote]
 }
 
-type User implements Obj {
+type User implements BaseEntity {
     id: ID!
     createdAt: DateTime!
     createdBy: User!
@@ -68,7 +68,7 @@ type SigninPayload {
     user: User
 }
 
-type Vote implements Obj {
+type Vote implements BaseEntity {
     id: ID!
     createdAt: DateTime!
     createdBy: User!
@@ -107,7 +107,7 @@ type Votes {
     pageInfo: PageInfo!
 }
 
-interface Obj {
+interface BaseEntity {
     id: ID!,
     createdAt: DateTime!
     createdBy: User!

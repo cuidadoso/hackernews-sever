@@ -10,11 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import static com.howtographql.sampl.hackernewsgraphqljava.specifications.LinkSpecifications.linkByDescription;
-import static com.howtographql.sampl.hackernewsgraphqljava.specifications.LinkSpecifications.linkByUrl;
+import static com.howtographql.sampl.hackernewsgraphqljava.specifications.LinkSpecifications.*;
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.UserSpecifications.userByEmail;
-import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSpecifications.voteByLink;
-import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSpecifications.voteByUser;
+import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSpecifications.*;
 
 @Log
 @Component
@@ -31,7 +29,7 @@ public class Query implements GraphQLQueryResolver {
     public Links links(LinkFilter filter, int page, int size, String orderBy) {
         BooleanExpression predicate = null;
         if(filter != null && filter.getUrlContains() != null && filter.getDescriptionContains() != null) {
-            predicate = linkByUrl(filter.getUrlContains()).or(linkByDescription(filter.getUrlContains()));
+            predicate = linkByUrlOrDescription(filter.getUrlContains(), filter.getDescriptionContains());
         } else if(filter != null && filter.getUrlContains() != null) {
             predicate = linkByUrl(filter.getUrlContains());
         } else if(filter != null && filter.getDescriptionContains() != null) {
@@ -64,7 +62,7 @@ public class Query implements GraphQLQueryResolver {
         BooleanExpression predicate = null;
 
         if (userId != null && linkId != null) {
-            predicate = voteByLink(linkId).and(voteByUser(userId));
+            predicate = voteByLinkAndUser(linkId, userId);
         } else if (userId != null) {
             predicate = voteByUser(userId);
         } else if (linkId != null) {

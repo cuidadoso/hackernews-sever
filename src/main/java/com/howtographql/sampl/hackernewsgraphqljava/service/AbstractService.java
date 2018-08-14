@@ -13,5 +13,6 @@ public interface AbstractService<Entity> {
     Entity save(Entity entity);
     void delete(Entity entity);
     void delete(Long id);
+    void delete(Iterable<Entity> entities);
     boolean exists(Long id);
 }

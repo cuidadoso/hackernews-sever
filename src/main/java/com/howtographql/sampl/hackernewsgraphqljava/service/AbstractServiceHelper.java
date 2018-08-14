@@ -66,6 +66,11 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
     }
 
     @Override
+    public void delete(Iterable<Entity> entities) {
+        repository.delete(entities);
+    }
+
+    @Override
     public boolean exists(Long id) {
         return repository.exists(id);
     }

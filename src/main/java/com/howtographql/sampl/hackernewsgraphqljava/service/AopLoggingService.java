@@ -1,8 +1,11 @@
 package com.howtographql.sampl.hackernewsgraphqljava.service;
 
-import com.howtographql.sampl.hackernewsgraphqljava.model.*;
+import com.howtographql.sampl.hackernewsgraphqljava.model.BaseEntities;
+import com.howtographql.sampl.hackernewsgraphqljava.model.BaseEntity;
+import com.howtographql.sampl.hackernewsgraphqljava.model.LinkFilter;
 import com.howtographql.sampl.hackernewsgraphqljava.resolvers.Query;
 import lombok.extern.java.Log;
+import org.apache.commons.text.StrBuilder;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -72,8 +75,7 @@ public class AopLoggingService {
             pointcut = "execution(* com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService.delete(..))"
     )
     public void onAfterDelete(final JoinPoint joinPoint) {
-        Long id = deleteArguments(joinPoint);
-        logInfo("Delete entity with ID [%d]", id);
+        logInfo("Delete entity with ID [%s]", deleteArguments(joinPoint));
     }
 
     private String entityName(final JoinPoint joinPoint) {
@@ -81,11 +83,16 @@ public class AopLoggingService {
         return target.getClassOfEntity().getSimpleName();
     }
 
-    private Long deleteArguments(final JoinPoint joinPoint) {
+    private String deleteArguments(final JoinPoint joinPoint) {
         Object arg = joinPoint.getArgs()[0];
         if (arg instanceof BaseEntity) {
-            return ((BaseEntity) arg).getId();
+            return ((BaseEntity) arg).getId().toString();
         }
-        return (Long) arg;
+        if (arg instanceof Iterable) {
+            StrBuilder ids = new StrBuilder();
+            ((Iterable) arg).forEach(a -> ids.append(a).append(", "));
+            return ids.substring(0, ids.length() - 2);
+        }
+        return (String) arg;
     }
 }

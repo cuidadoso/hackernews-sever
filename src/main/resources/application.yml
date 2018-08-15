@@ -3,6 +3,3 @@ graphql:
     mapping: /graphql
     enabled: true
     corsEnabled: true
-    subscriptions:
-      websocket:
-        path: /subscriptions

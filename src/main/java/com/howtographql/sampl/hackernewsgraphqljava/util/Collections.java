@@ -9,18 +9,14 @@ import java.util.List;
 @UtilityClass
 public class Collections {
     public static <E> Collection<E> makeCollection(Iterable<E> iter) {
-        Collection<E> list = new ArrayList<>();
-        for (E item : iter) {
-            list.add(item);
-        }
-        return list;
+        Collection<E> collection = new ArrayList<>();
+        iter.forEach(collection::add);
+        return collection;
     }
 
     public static <E> List<E> makeList(Iterable<E> iter) {
         List<E> list = new ArrayList<>();
-        for (E item : iter) {
-            list.add(item);
-        }
+        iter.forEach(list::add);
         return list;
     }
 }

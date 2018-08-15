@@ -22,17 +22,17 @@ import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSp
 @RequiredArgsConstructor
 public class Mutation implements GraphQLMutationResolver {
     @Qualifier("linkService")
-    private final AbstractService linkService;
+    private final AbstractService<Link, Links> linkService;
     @Qualifier("userService")
-    private final AbstractService userService;
+    private final AbstractService<User, Users> userService;
     @Qualifier("voteService")
-    private final AbstractService voteService;
+    private final AbstractService<Vote, Votes> voteService;
     private final SessionService sessionService;
 
     // Link mutation resolvers
     public Link createLink(String url, String description, DataFetchingEnvironment env) {
         AuthContext context = env.getContext();
-        return (Link) linkService.save(Link
+        return linkService.save(Link
                 .builder()
                 .url(url)
                 .description(description)
@@ -51,7 +51,7 @@ public class Mutation implements GraphQLMutationResolver {
 
     // User mutation resolvers
     public User createUser(String name, String email, String password) {
-        return (User) userService.save(User
+        return userService.save(User
                 .builder()
                 .name(name)
                 .email(email)
@@ -68,7 +68,7 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public User createUserAuth(String name, AuthData authData) {
-        return (User) userService.save(User
+        return userService.save(User
                 .builder()
                 .name(name)
                 .email(authData.getEmail())
@@ -77,7 +77,7 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public SigninPayload signUp(String name, String email, String password) {
-        User user = (User) userService.save(User
+        User user = userService.save(User
                 .builder()
                 .name(name)
                 .email(email)
@@ -109,7 +109,7 @@ public class Mutation implements GraphQLMutationResolver {
 
     // Vote mutation resolvers
     public Vote createVote(Long linkId, Long userId) {
-        return (Vote) voteService.save(Vote
+        return voteService.save(Vote
                 .builder()
                 .userId(userId)
                 .linkId(linkId)
@@ -125,7 +125,7 @@ public class Mutation implements GraphQLMutationResolver {
         if (!votes.isEmpty()) {
             return null;
         }
-        return (Vote) voteService.save(Vote
+        return voteService.save(Vote
                 .builder()
                 .userId(sessionService.userId())
                 .linkId(linkId)

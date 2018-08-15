@@ -28,7 +28,7 @@ import static org.springframework.data.domain.Sort.Direction.ASC;
 @Getter
 @RequiredArgsConstructor
 public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities extends BaseEntities>
-        implements AbstractService<Entity> {
+        implements AbstractService<Entity, Entities> {
     private final Class<Entity> classOfEntity;
     private final Class<Entities> classOfEntities;
     private final BaseRepository<Entity> repository;
@@ -36,6 +36,10 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
     @Override
     public Entity findOne(Long id) {
         return repository.findOne(id);
+    }
+
+    public List<Entity> findAll() {
+        return repository.findAll();
     }
 
     public List<Entity> findAll(BooleanExpression predicate) {

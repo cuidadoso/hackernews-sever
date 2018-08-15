@@ -19,11 +19,11 @@ import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSp
 @RequiredArgsConstructor
 public class Query implements GraphQLQueryResolver {
     @Qualifier("linkService")
-    private final AbstractService linkService;
+    private final AbstractService<Link, Links> linkService;
     @Qualifier("userService")
-    private final AbstractService userService;
+    private final AbstractService<User, Users> userService;
     @Qualifier("voteService")
-    private final AbstractService voteService;
+    private final AbstractService<Vote, Votes> voteService;
 
     // Link query resolvers
     public Links links(LinkFilter filter, int page, int size, String orderBy) {
@@ -35,12 +35,12 @@ public class Query implements GraphQLQueryResolver {
         } else if(filter != null && filter.getDescriptionContains() != null) {
             predicate = linkByDescription(filter.getDescriptionContains());
         }
-        return (Links) linkService.findAll(predicate, page, size, orderBy);
+        return linkService.findAll(predicate, page, size, orderBy);
 
     }
 
     public Link link(Long id) {
-        return (Link) linkService.findOne(id);
+        return linkService.findOne(id);
     }
 
     // User query resolvers
@@ -50,11 +50,11 @@ public class Query implements GraphQLQueryResolver {
             predicate = userByEmail(email);
         }
 
-        return (Users) userService.findAll(predicate, page, size, orderBy);
+        return userService.findAll(predicate, page, size, orderBy);
     }
 
     public User user(Long id) {
-        return (User) userService.findOne(id);
+        return userService.findOne(id);
     }
 
     // Vote query resolvers
@@ -68,10 +68,10 @@ public class Query implements GraphQLQueryResolver {
         } else if (linkId != null) {
             predicate = voteByLink(linkId);
         }
-        return (Votes) voteService.findAll(predicate, page, size, orderBy);
+        return voteService.findAll(predicate, page, size, orderBy);
     }
 
     public Vote vote(Long id) {
-        return (Vote) voteService.findOne(id);
+        return voteService.findOne(id);
     }
 }

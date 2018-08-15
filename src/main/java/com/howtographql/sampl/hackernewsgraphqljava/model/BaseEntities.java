@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class BaseEntities<E extends BaseEntity> {
-    private List<E> items;
+public class BaseEntities<Entity extends BaseEntity> {
+    private List<Entity> items;
     private PageInfo pageInfo;
 }

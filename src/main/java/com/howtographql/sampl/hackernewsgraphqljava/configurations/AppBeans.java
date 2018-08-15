@@ -26,6 +26,7 @@ public class AppBeans {
             @Override
             public void registerStompEndpoints(StompEndpointRegistry registry) {
                 registry.addEndpoint("/subscriptions").withSockJS();
+                registry.addEndpoint("/color").withSockJS();
             }
         };
     }

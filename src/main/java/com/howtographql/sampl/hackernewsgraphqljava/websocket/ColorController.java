@@ -1,13 +1,9 @@
 package com.howtographql.sampl.hackernewsgraphqljava.websocket;
 
-import javafx.scene.paint.Color;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
-
-import java.util.Random;
 
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 
@@ -22,7 +18,7 @@ public class ColorController {
     }
 
 
-    @Scheduled(fixedDelay = 1000)
+    /*@Scheduled(fixedDelay = 1000)
     private void bgColor(){
         Random r = new Random();
         Color rgb = Color.rgb(r.nextInt(255), r.nextInt(255), r.nextInt(255), r.nextDouble());
@@ -30,5 +26,5 @@ public class ColorController {
         String color = m.replace("0x", "#");
         simpMessagingTemplate.convertAndSend("/topic/color", new ColorMessage(color));
         logInfo("Send color: " + color);
-    }
+    }*/
 }

@@ -3,8 +3,7 @@ package com.howtographql.sampl.hackernewsgraphqljava.configurations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +11,7 @@ import java.util.Map;
 import static org.springframework.context.annotation.ScopedProxyMode.TARGET_CLASS;
 
 @Configuration
+@EnableWebSocket
 public class AppBeans {
     @Bean
     @Scope(value = "singleton", proxyMode = TARGET_CLASS)
@@ -19,15 +19,12 @@ public class AppBeans {
         return new HashMap<>();
     }
 
-    @Bean
+    /*@Bean
     @Scope(value = "singleton", proxyMode = TARGET_CLASS)
-    public AbstractWebSocketMessageBrokerConfigurer webSocket() {
-        return new AbstractWebSocketMessageBrokerConfigurer() {
-            @Override
-            public void registerStompEndpoints(StompEndpointRegistry registry) {
-                registry.addEndpoint("/subscriptions").withSockJS();
-                registry.addEndpoint("/color").withSockJS();
-            }
-        };
-    }
+    public WebSocketConfigurer webSocket() {
+        return registry -> registry.addHandler(new SocketHandler(), "/subscriptions")
+                .setAllowedOrigins("*")
+                .addInterceptors(new CustomHandshakeInterceptor())
+                .setHandshakeHandler(new CustomHandshakeHandler());
+    }*/
 }

@@ -29,9 +29,10 @@ type Mutation {
 
 type Subscription {
     newLink: Link!
+    newVote: Vote!
 }
 
-type Link implements BaseEntity {
+type Link {
     id: ID!,
     createdAt: DateTime!
     createdBy: User!
@@ -45,7 +46,7 @@ type Link implements BaseEntity {
     votes: [Vote]
 }
 
-type User implements BaseEntity {
+type User {
     id: ID!
     createdAt: DateTime!
     createdBy: User!
@@ -58,17 +59,7 @@ type User implements BaseEntity {
     password: String
 }
 
-input AuthData {
-    email: String!
-    password: String!
-}
-
-type SigninPayload {
-    token: Long
-    user: User
-}
-
-type Vote implements BaseEntity {
+type Vote {
     id: ID!
     createdAt: DateTime!
     createdBy: User!
@@ -80,6 +71,15 @@ type Vote implements BaseEntity {
     link: Link!
 }
 
+input AuthData {
+    email: String!
+    password: String!
+}
+
+type SigninPayload {
+    token: Long
+    user: User
+}
 scalar DateTime
 
 input LinkFilter {
@@ -90,6 +90,7 @@ input LinkFilter {
 type PageInfo {
     hasNextPage: Boolean!
     hasPreviousPage: Boolean!
+    total: Long
 }
 
 type Links {
@@ -105,14 +106,4 @@ type Users {
 type Votes {
     items: [Vote!]!
     pageInfo: PageInfo!
-}
-
-interface BaseEntity {
-    id: ID!,
-    createdAt: DateTime!
-    createdBy: User!
-    updatedAt: DateTime!
-    updatedBy: User!
-    deletedAt: DateTime
-    deletedBy: User
 }

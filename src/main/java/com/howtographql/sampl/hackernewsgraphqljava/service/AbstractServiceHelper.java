@@ -21,6 +21,7 @@ import java.util.List;
 import static com.howtographql.sampl.hackernewsgraphqljava.configurations.SpringBeanUtils.session;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Collections.makeList;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.NOW;
+import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.NULL;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logError;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 import static org.springframework.data.domain.Sort.Direction.ASC;
@@ -31,7 +32,7 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
         implements AbstractService<Entity, Entities> {
     private final Class<Entity> classOfEntity;
     private final Class<Entities> classOfEntities;
-    private final BaseRepository<Entity> repository;
+    protected final BaseRepository<Entity> repository;
 
     @Override
     public Entity findOne(Long id) {
@@ -58,20 +59,31 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
     }
 
     @Override
-    public void delete(Entity entity) {
-        entity.setDeletedAt(NOW);
-        entity.setUpdatedBy(session().userId());
-        repository.save(entity);
+    public List<Entity> save(List<Entity> entities) {
+        return repository.save(entities);
     }
 
     @Override
-    public void delete(Long id) {
-        delete(repository.findOne(id));
+    public boolean delete(Entity entity) {
+        if (entity != null && exists(entity.getId())) {
+            entity.setDeletedAt(NOW);
+            entity.setUpdatedBy(session().userId());
+            repository.save(entity);
+            return true;
+        }
+        throw new GraphQLException(String.format("Entity %s [%s] not exists", classOfEntity.getSimpleName(),
+                entity == null ? NULL : entity.toString()));
     }
 
     @Override
-    public void delete(Iterable<Entity> entities) {
-        repository.delete(entities);
+    public boolean delete(Long id) {
+            return delete(repository.findOne(id));
+    }
+
+    @Override
+    public boolean delete(Iterable<Entity> entities) {
+        entities.forEach(this::delete);
+        return true;
     }
 
     @Override

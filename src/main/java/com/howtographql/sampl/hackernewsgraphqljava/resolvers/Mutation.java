@@ -2,8 +2,10 @@ package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.*;
-import com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService;
+import com.howtographql.sampl.hackernewsgraphqljava.service.LinkService;
 import com.howtographql.sampl.hackernewsgraphqljava.service.SessionService;
+import com.howtographql.sampl.hackernewsgraphqljava.service.UserService;
+import com.howtographql.sampl.hackernewsgraphqljava.service.VoteService;
 import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
@@ -12,26 +14,27 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.UserSpecifications.userByEmail;
-import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSpecifications.voteByLink;
 
 @Log
 @Component
 @RequiredArgsConstructor
 public class Mutation implements GraphQLMutationResolver {
     @Qualifier("linkService")
-    private final AbstractService<Link, Links> linkService;
+    private final LinkService linkService;
     @Qualifier("userService")
-    private final AbstractService<User, Users> userService;
+    private final UserService userService;
     @Qualifier("voteService")
-    private final AbstractService<Vote, Votes> voteService;
+    private final VoteService voteService;
     private final SessionService sessionService;
 
     // Link mutation resolvers
     public Link createLink(String url, String description, DataFetchingEnvironment env) {
         AuthContext context = env.getContext();
+        if (linkService.existsUniq(url)) {
+            throw new GraphQLException(String.format("Link [%s] already exists", url));
+        }
         return linkService.save(Link
                 .builder()
                 .url(url)
@@ -42,15 +45,14 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public boolean deleteLink(Long id) {
-        if (linkService.exists(id)) {
-            linkService.delete(id);
-            return true;
-        }
-        throw new GraphQLException("Link not exists");
+            return linkService.delete(id);
     }
 
     // User mutation resolvers
     public User createUser(String name, String email, String password) {
+        if (userService.existsUniq(email)) {
+            throw new GraphQLException(String.format("User with email [%s] already exists", email));
+        }
         return userService.save(User
                 .builder()
                 .name(name)
@@ -60,23 +62,26 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public boolean deleteUset(Long id) {
-        if (userService.exists(id)) {
-            userService.delete(id);
-            return true;
-        }
-        throw new GraphQLException("User not exists");
+            return userService.delete(id);
     }
 
     public User createUserAuth(String name, AuthData authData) {
+        String email = authData.getEmail();
+        if (userService.existsUniq(email)) {
+            throw new GraphQLException(String.format("User with email [%s] already exists", email));
+        }
         return userService.save(User
                 .builder()
                 .name(name)
-                .email(authData.getEmail())
+                .email(email)
                 .password(authData.getPassword())
                 .build());
     }
 
     public SigninPayload signUp(String name, String email, String password) {
+        if (userService.existsUniq(email)) {
+            throw new GraphQLException(String.format("User with email [%s] already exists", email));
+        }
         User user = userService.save(User
                 .builder()
                 .name(name)
@@ -109,6 +114,9 @@ public class Mutation implements GraphQLMutationResolver {
 
     // Vote mutation resolvers
     public Vote createVote(Long linkId, Long userId) {
+        if (voteService.existsUniq(linkId, userId)) {
+            throw new GraphQLException(String.format("Vote with link [%d] and user [%d] already exists", linkId, userId));
+        }
         return voteService.save(Vote
                 .builder()
                 .userId(userId)
@@ -117,13 +125,9 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public Vote vote(Long linkId) {
-        List<Vote> all = voteService.findAll(voteByLink(linkId));
-        List<Vote> votes = all
-                .stream()
-                .filter(vote -> vote.getUserId().equals(sessionService.userId()))
-                .collect(Collectors.toList());
-        if (!votes.isEmpty()) {
-            return null;
+        Long userId = sessionService.userId();
+        if (voteService.existsUniq(linkId, userId)) {
+            throw new GraphQLException(String.format("Vote with link [%d] and user [%d] already exists", linkId, userId));
         }
         return voteService.save(Vote
                 .builder()
@@ -133,10 +137,6 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public boolean deleteVote(Long id) {
-        if (voteService.exists(id)) {
-            voteService.delete(id);
-            return true;
-        }
-        throw new GraphQLException("Vote not exists");
+            return voteService.delete(id);
     }
 }

@@ -10,8 +10,9 @@ public interface AbstractService<Entity, Entities> {
     List<Entity> findAll(BooleanExpression predicate);
     Entities findAll(BooleanExpression predicate, int page, int size, String orderBy);
     Entity save(Entity entity);
-    void delete(Entity entity);
-    void delete(Long id);
-    void delete(Iterable<Entity> entities);
+    List<Entity> save(List<Entity> entity);
+    boolean delete(Entity entity);
+    boolean delete(Long id);
+    boolean delete(Iterable<Entity> entities);
     boolean exists(Long id);
 }

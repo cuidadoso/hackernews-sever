@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
+import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.USER_ID;
+
 @Component
 public class EndPoint extends SimpleGraphQLServlet {
     @Qualifier("userService")
@@ -39,9 +41,9 @@ public class EndPoint extends SimpleGraphQLServlet {
                     if (StringUtils.isNumeric(id)) {
                         return (User) userService.findOne(Long.parseLong(id));
                     }
-                    return (User) userService.findOne(1L);
+                    return (User) userService.findOne(USER_ID);
                 })
-                .orElse((User) userService.findOne(1L));
+                .orElse((User) userService.findOne(USER_ID));
         return new AuthContext(user, request, response);
     }
 

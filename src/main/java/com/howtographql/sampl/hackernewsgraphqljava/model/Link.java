@@ -4,8 +4,10 @@ import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "links")
 @Where(clause = "DELETED_AT IS NULL")
 @Getter
 @Builder

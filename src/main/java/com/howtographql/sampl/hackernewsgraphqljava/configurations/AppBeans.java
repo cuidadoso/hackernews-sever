@@ -18,13 +18,4 @@ public class AppBeans {
     public Map<String, Object> store() {
         return new HashMap<>();
     }
-
-    /*@Bean
-    @Scope(value = "singleton", proxyMode = TARGET_CLASS)
-    public WebSocketConfigurer webSocket() {
-        return registry -> registry.addHandler(new SocketHandler(), "/subscriptions")
-                .setAllowedOrigins("*")
-                .addInterceptors(new CustomHandshakeInterceptor())
-                .setHandshakeHandler(new CustomHandshakeHandler());
-    }*/
 }

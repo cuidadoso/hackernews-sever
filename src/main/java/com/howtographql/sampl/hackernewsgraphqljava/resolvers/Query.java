@@ -2,7 +2,9 @@ package com.howtographql.sampl.hackernewsgraphqljava.resolvers;
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.howtographql.sampl.hackernewsgraphqljava.model.*;
-import com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService;
+import com.howtographql.sampl.hackernewsgraphqljava.service.LinkService;
+import com.howtographql.sampl.hackernewsgraphqljava.service.UserService;
+import com.howtographql.sampl.hackernewsgraphqljava.service.VoteService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -19,11 +21,11 @@ import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSp
 @RequiredArgsConstructor
 public class Query implements GraphQLQueryResolver {
     @Qualifier("linkService")
-    private final AbstractService<Link, Links> linkService;
+    private final LinkService linkService;
     @Qualifier("userService")
-    private final AbstractService<User, Users> userService;
+    private final UserService userService;
     @Qualifier("voteService")
-    private final AbstractService<Vote, Votes> voteService;
+    private final VoteService voteService;
 
     // Link query resolvers
     public Links links(LinkFilter filter, int page, int size, String orderBy) {

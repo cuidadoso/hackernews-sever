@@ -19,7 +19,12 @@ import java.time.ZonedDateTime;
 // @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "app_seq")
+    @SequenceGenerator(
+            name = "app_seq",
+            sequenceName = "app_seq",
+            allocationSize = 1
+    )
     protected Long id;
 
     @CreatedDate

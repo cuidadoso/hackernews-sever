@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.UID;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.JsonKit.*;
 import static com.howtographql.sampl.hackernewsgraphqljava.websocket.OperationMessage.*;
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
@@ -146,7 +147,7 @@ public class SocketHandler extends TextWebSocketHandler implements SubProtocolCa
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        String uid = (String) session.getAttributes().get("uid");
+        String uid = (String) session.getAttributes().get(UID);
         USER_SOCKET_SESSION_MAP.putIfAbsent(uid, session);
     }
 

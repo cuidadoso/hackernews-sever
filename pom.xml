@@ -24,6 +24,8 @@
 		<java.version>1.8</java.version>
 		<graphql-java.version>3.10.0</graphql-java.version>
 		<graphql-java-tools.version>4.3.0</graphql-java-tools.version>
+		<org.postgresql.driver.version>42.2.4</org.postgresql.driver.version>
+		<hibernate.version>5.3.5.Final</hibernate.version>
 	</properties>
 
 	<dependencies>
@@ -103,6 +105,17 @@
 			<version>2.2.0</version>
 		</dependency>
 
+		<!-- Database/persists dependencies -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${org.postgresql.driver.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -110,7 +123,108 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<addResources>true</addResources>
+				</configuration>
 			</plugin>
+
+			<!-- Plugin allows to test in isolated DB and recreates DB and schema -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>sql-maven-plugin</artifactId>
+				<version>1.5</version>
+
+				<dependencies>
+					<dependency>
+						<groupId>org.postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>${org.postgresql.driver.version}</version>
+					</dependency>
+				</dependencies>
+
+				<!-- Perform DB and schema operations on behalf of root user -->
+				<configuration>
+					<driver>org.postgresql.Driver</driver>
+					<url>jdbc:postgresql://localhost:5432</url>
+					<username>admin</username>
+					<password>password</password>
+				</configuration>
+
+				<executions>
+
+					<!-- Create role if not exists -->
+					<execution>
+						<id>install-create-role</id>
+						<phase>install</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<url>jdbc:postgresql://localhost:5432/postgres</url>
+							<autocommit>true</autocommit>
+							<!-- PostgreSQL has no construction such as CREATE ROLE IF NOT EXISTS. Workaround -->
+							<sqlCommand>
+                                DO
+                                $body$
+                                BEGIN
+                                   IF NOT EXISTS (SELECT FROM pg_catalog.pg_user WHERE usename = 'ALPERE') THEN
+                                      CREATE ROLE "ALPERE" LOGIN PASSWORD 'ALPERE' VALID UNTIL 'infinity';
+                                   END IF;
+                                END
+                                $body$;
+                            </sqlCommand>
+							<!-- Workaround to execute DO pgSQL block -->
+							<delimiter>/</delimiter>
+							<delimiterType>row</delimiterType>
+						</configuration>
+					</execution>
+
+					<!-- Create database -->
+					<execution>
+						<id>install-create-db</id>
+						<phase>install</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<url>jdbc:postgresql://localhost:5432/postgres</url>
+							<autocommit>true</autocommit>
+							<sqlCommand>CREATE DATABASE "ALPERE"</sqlCommand>
+							<onError>continue</onError>
+						</configuration>
+					</execution>
+
+					<!-- Grant database a role -->
+					<execution>
+						<id>install-assign-role-to-db</id>
+						<phase>install</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<url>jdbc:postgresql://localhost:5432/postgres</url>
+							<autocommit>true</autocommit>
+							<sqlCommand>ALTER DATABASE "ALPERE" OWNER TO "ALPERE"</sqlCommand>
+						</configuration>
+					</execution>
+
+					<!-- Grant schema a role -->
+					<execution>
+						<id>install-assign-role-to-schema</id>
+						<phase>install</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<url>jdbc:postgresql://localhost:5432/ALPERE</url>
+							<autocommit>true</autocommit>
+							<sqlCommand>ALTER SCHEMA public OWNER TO "ALPERE"</sqlCommand>
+						</configuration>
+					</execution>
+
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>com.mysema.maven</groupId>
 				<artifactId>apt-maven-plugin</artifactId>

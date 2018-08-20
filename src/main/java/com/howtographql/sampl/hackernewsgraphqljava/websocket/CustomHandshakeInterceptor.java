@@ -8,6 +8,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 
 import java.util.Map;
 
+import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.UID;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 
 public class CustomHandshakeInterceptor extends HttpSessionHandshakeInterceptor {
@@ -19,13 +20,13 @@ public class CustomHandshakeInterceptor extends HttpSessionHandshakeInterceptor 
         logInfo("before handshake");
         ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
         String uid = servletRequest.getServletRequest().getRequestedSessionId();
-        // Long uid = (Long)session.getAttribute("uid");
+        // Long uid = (Long)session.getAttribute(UID);
         if(uid == null){
             return false;
         }
 
         //websocket.html?uid=1990:56 WebSocket connection to 'ws://localhost:8080/ws?uid=1990' failed: Error during WebSocket handshake: Unexpected response code: 500
-        attributes.put("uid", uid);
+        attributes.put(UID, uid);
         return true;
 
         // WebSocket connection to 'ws://localhost:8080/ws' failed: Error during WebSocket handshake: Unexpected response code: 200

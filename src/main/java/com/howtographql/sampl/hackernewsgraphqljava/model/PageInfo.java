@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 @Builder
+@RequiredArgsConstructor
 public class PageInfo {
     private final boolean hasNextPage;
     private final boolean hasPreviousPage;
     private final Long total;
+    private final int totalPages;
 }

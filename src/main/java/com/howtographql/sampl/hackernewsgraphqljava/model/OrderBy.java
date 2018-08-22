@@ -3,13 +3,11 @@ package com.howtographql.sampl.hackernewsgraphqljava.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthData {
-    private String email;
-    private String password;
+public class OrderBy {
+    private String id;
+    private boolean desc;
 }

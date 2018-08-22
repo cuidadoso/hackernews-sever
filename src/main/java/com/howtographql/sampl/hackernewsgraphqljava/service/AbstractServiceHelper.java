@@ -2,18 +2,17 @@ package com.howtographql.sampl.hackernewsgraphqljava.service;
 
 import com.howtographql.sampl.hackernewsgraphqljava.model.BaseEntities;
 import com.howtographql.sampl.hackernewsgraphqljava.model.BaseEntity;
+import com.howtographql.sampl.hackernewsgraphqljava.model.OrderBy;
 import com.howtographql.sampl.hackernewsgraphqljava.model.PageInfo;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.BaseRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import graphql.GraphQLException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 
 import java.util.List;
@@ -25,6 +24,7 @@ import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.NULL;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logError;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Getter
 @RequiredArgsConstructor
@@ -48,7 +48,7 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
         return makeList(entities);
     }
 
-    public Entities findAll(BooleanExpression predicate, int page, int size, String orderBy) {
+    public Entities findAll(BooleanExpression predicate, int page, int size, List<OrderBy> orderBy) {
         Page<Entity> entityPage = page(predicate, page, size, orderBy);
         return entities(entityPage);
     }
@@ -91,7 +91,7 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
         return repository.exists(id);
     }
 
-    private Page<Entity> page(BooleanExpression predicate, int page, int size, String orderBy) {
+    private Page<Entity> page(BooleanExpression predicate, int page, int size, List<OrderBy> orderBy) {
         Pageable pageable = new PageRequest(page, size, orders(orderBy));
         return repository.findAll(predicate, pageable);
     }
@@ -107,32 +107,29 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
     }
 
     private PageInfo pageInfo(Page<Entity> entities) {
-        int totalPages = entities.getTotalPages();
-        int pageNumber = entities.getNumber() + 1;
-        long total = entities.getTotalElements();
         return PageInfo.builder()
-                .hasNextPage(pageNumber < totalPages)
-                .hasPreviousPage(pageNumber > 1)
-                .total(total)
+                .hasNextPage(entities.nextPageable() != null)
+                .hasPreviousPage(entities.previousPageable() != null)
+                .total(entities.getTotalElements())
+                .totalPages(entities.getTotalPages())
                 .build();
     }
 
-    private Sort orders(String orderBy) {
-        if (!StringUtils.isBlank(orderBy) && isBaseEntity()) {
-            String[] orderParams = orderBy.split("_");
-            String fieldName = orderParams[0];
-            Direction direction = Direction.fromStringOrNull(orderParams[1]);
-            switch (fieldName) {
+    private Sort orders(List<OrderBy> orderBy) {
+        if (orderBy != null && !orderBy.isEmpty() && isBaseEntity()) {
+            String id = orderBy.get(0).getId();
+            boolean desc = orderBy.get(0).isDesc();
+            switch (id) {
                 case "id":
                 case "createdAt":
-                    return new Sort(new Order(direction == null ? ASC : direction, fieldName));
+                    return new Sort(new Order(desc ? DESC : ASC, id));
                 default:
                     try {
                         // Just to check if classOfEntity contains field with name = fieldName
-                        classOfEntity.getDeclaredField(fieldName);
-                        return new Sort(new Order(direction == null ? ASC : direction, fieldName));
+                        classOfEntity.getDeclaredField(id);
+                        return new Sort(new Order(desc ? DESC : ASC, id));
                     } catch (NoSuchFieldException e) {
-                        logInfo("Entity [%s] doesn't have field [%s].", classOfEntity.getSimpleName(), fieldName);
+                        logInfo("Entity [%s] doesn't have field [%s].", classOfEntity.getSimpleName(), id);
                     }
             }
         }

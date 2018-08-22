@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.LinkSpecifications.*;
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.UserSpecifications.userByEmail;
 import static com.howtographql.sampl.hackernewsgraphqljava.specifications.VoteSpecifications.*;
@@ -28,7 +30,7 @@ public class Query implements GraphQLQueryResolver {
     private final VoteService voteService;
 
     // Link query resolvers
-    public Links links(LinkFilter filter, int page, int size, String orderBy) {
+    public Links links(LinkFilter filter, int page, int size, List<OrderBy> orderBy) {
         BooleanExpression predicate = null;
         if(filter != null && filter.getUrlContains() != null && filter.getDescriptionContains() != null) {
             predicate = linkByUrlOrDescription(filter.getUrlContains(), filter.getDescriptionContains());
@@ -46,7 +48,7 @@ public class Query implements GraphQLQueryResolver {
     }
 
     // User query resolvers
-    public Users users(String email, int page, int size, String orderBy) {
+    public Users users(String email, int page, int size, List<OrderBy> orderBy) {
         BooleanExpression predicate = null;
         if (!StringUtils.isBlank(email)) {
             predicate = userByEmail(email);
@@ -60,7 +62,7 @@ public class Query implements GraphQLQueryResolver {
     }
 
     // Vote query resolvers
-    public Votes votes(Long userId, Long linkId, int page, int size, String orderBy) {
+    public Votes votes(Long userId, Long linkId, int page, int size, List<OrderBy> orderBy) {
         BooleanExpression predicate = null;
 
         if (userId != null && linkId != null) {

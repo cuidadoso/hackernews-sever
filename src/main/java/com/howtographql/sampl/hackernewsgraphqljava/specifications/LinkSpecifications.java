@@ -1,12 +1,23 @@
 package com.howtographql.sampl.hackernewsgraphqljava.specifications;
 
+import com.google.common.collect.ImmutableMap;
 import com.howtographql.sampl.hackernewsgraphqljava.model.QLink;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.experimental.UtilityClass;
 
+import java.lang.reflect.Method;
+import java.util.Map;
+
 
 @UtilityClass
 public class LinkSpecifications {
+
+    public static Map<String, Method> predicates() throws NoSuchMethodException {
+        return ImmutableMap.of(
+                "url", LinkSpecifications.class.getDeclaredMethod("linkByUrl", String.class),
+                "description", LinkSpecifications.class.getDeclaredMethod("linkByDescription", String.class));
+    }
+
     public static BooleanExpression linkByUrl(String url) {
         return QLink.link.url.contains(url);
     }

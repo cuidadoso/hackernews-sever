@@ -2,7 +2,6 @@ package com.howtographql.sampl.hackernewsgraphqljava.service;
 
 import com.howtographql.sampl.hackernewsgraphqljava.model.BaseEntities;
 import com.howtographql.sampl.hackernewsgraphqljava.model.BaseEntity;
-import com.howtographql.sampl.hackernewsgraphqljava.model.LinkFilter;
 import com.howtographql.sampl.hackernewsgraphqljava.resolvers.Query;
 import lombok.extern.java.Log;
 import org.apache.commons.text.StrBuilder;
@@ -11,6 +10,8 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 
@@ -21,7 +22,11 @@ import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 public class AopLoggingService {
 
     /**
-     * Validator/logger for {@link Query#links(LinkFilter, int, int, String)}
+     * Validator/logger for {
+       @link Query#links(List, int, int, List)
+       @link Query#users(List, int, int, List)
+       @link Query#votes(List, int, int, List)
+       }
      *
      * @param joinPoint Join point object
      * @param entities  List od entities with page info.
@@ -37,7 +42,11 @@ public class AopLoggingService {
     }
 
     /**
-     * Validator/logger for {@link Query#link(Long)}
+     * Validator/logger for {
+       @link Query#link(Long)
+       @link Query#user(Long)
+       @link Query#vote(Long)
+       }
      *
      * @param joinPoint Join point object
      * @param entity    Entity.
@@ -80,7 +89,7 @@ public class AopLoggingService {
 
     private String entityName(final JoinPoint joinPoint) {
         AbstractServiceHelper target = (AbstractServiceHelper) joinPoint.getTarget();
-        return target.getClassOfEntity().getSimpleName();
+        return target.getEntityClass().getSimpleName();
     }
 
     private String deleteArguments(final JoinPoint joinPoint) {

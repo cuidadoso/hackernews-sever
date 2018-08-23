@@ -19,4 +19,8 @@ public class Collections {
         iter.forEach(list::add);
         return list;
     }
+
+    public static boolean isBlankCollection(Collection collection) {
+        return collection == null || collection.isEmpty();
+    }
 }

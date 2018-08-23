@@ -5,11 +5,11 @@ schema {
 }
 
 type Query {
-    links(filter: LinkFilter = {}, page: Int = 0, size: Int = 10, orderBy: [OrderBy]): Links
+    links(filter: [Filter], page: Int = 0, size: Int = 10, orderBy: [OrderBy]): Links
     link(id: ID!): Link
-    users(email: String, page: Int = 0, size: Int = 10, orderBy: [OrderBy]): Users
+    users(filter: [Filter], page: Int = 0, size: Int = 10, orderBy: [OrderBy]): Users
     user(id: ID!): User
-    votes(userId: ID, linkId: ID, page: Int = 0, size: Int = 10, orderBy: [OrderBy]): Votes
+    votes(filter: [Filter], page: Int = 0, size: Int = 10, orderBy: [OrderBy]): Votes
     vote(id: ID!): Vote
 }
 
@@ -112,4 +112,9 @@ type Votes {
 input OrderBy {
     id: String!
     desc: Boolean!
+}
+
+input Filter {
+    id: String!
+    value: String!
 }

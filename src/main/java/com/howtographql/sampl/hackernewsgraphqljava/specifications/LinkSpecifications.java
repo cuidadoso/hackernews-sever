@@ -15,7 +15,9 @@ public class LinkSpecifications {
     public static Map<String, Method> predicates() throws NoSuchMethodException {
         return ImmutableMap.of(
                 "url", LinkSpecifications.class.getDeclaredMethod("linkByUrl", String.class),
-                "description", LinkSpecifications.class.getDeclaredMethod("linkByDescription", String.class));
+                "description", LinkSpecifications.class.getDeclaredMethod("linkByDescription", String.class),
+                "url_or_description", LinkSpecifications.class.getDeclaredMethod("linkByUrlOrDescription", String.class, String.class)
+        );
     }
 
     public static BooleanExpression linkByUrl(String url) {

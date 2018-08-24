@@ -182,18 +182,17 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
         return predicates;
     }
 
-    private BooleanExpression createPredicate(String id, String value) {
+    protected BooleanExpression createPredicate(String id, String value) {
         try {
             Method method = predicates().get(id);
-            BooleanExpression predicate = (BooleanExpression) method.invoke(specClass, value);
             switch (id) {
                 case "id":
                 case "createdAt":
-                    return predicate;
+                    return (BooleanExpression) method.invoke(specClass, value);
                 default:
                     // Just to check if classOfEntity contains field with name = id
                     entityClass.getDeclaredField(id);
-                    return predicate;
+                    return (BooleanExpression) method.invoke(specClass, value);
             }
         } catch (Exception e) {
             throw new CustomException(String.format("Entity [%s] doesn't have predicates.", entityClass.getSimpleName()));

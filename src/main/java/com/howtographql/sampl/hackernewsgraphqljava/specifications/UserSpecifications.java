@@ -1,12 +1,13 @@
 package com.howtographql.sampl.hackernewsgraphqljava.specifications;
 
 import com.google.common.collect.ImmutableMap;
-import com.howtographql.sampl.hackernewsgraphqljava.model.QUser;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+
+import static com.howtographql.sampl.hackernewsgraphqljava.model.QUser.user;
 
 @UtilityClass
 public class UserSpecifications {
@@ -17,10 +18,10 @@ public class UserSpecifications {
     }
 
     public static BooleanExpression userByEmail(String email) {
-        return QUser.user.email.contains(email);
+        return user.email.contains(email);
     }
 
     public static BooleanExpression userByName(String name) {
-        return QUser.user.name.contains(name);
+        return user.name.contains(name);
     }
 }

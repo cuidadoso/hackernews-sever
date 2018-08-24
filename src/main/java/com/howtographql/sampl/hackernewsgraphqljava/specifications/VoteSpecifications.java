@@ -1,12 +1,13 @@
 package com.howtographql.sampl.hackernewsgraphqljava.specifications;
 
 import com.google.common.collect.ImmutableMap;
-import com.howtographql.sampl.hackernewsgraphqljava.model.QVote;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+
+import static com.howtographql.sampl.hackernewsgraphqljava.model.QVote.vote;
 
 @UtilityClass
 public class VoteSpecifications {
@@ -17,11 +18,11 @@ public class VoteSpecifications {
     }
 
     public static BooleanExpression voteByLink(Long linkId) {
-        return QVote.vote.linkId.eq(linkId);
+        return vote.linkId.eq(linkId);
     }
 
     public static BooleanExpression voteByUser(Long userId) {
-        return QVote.vote.userId.eq(userId);
+        return vote.userId.eq(userId);
     }
 
     public static BooleanExpression voteByLinkAndUser(Long linkId, Long userId) {

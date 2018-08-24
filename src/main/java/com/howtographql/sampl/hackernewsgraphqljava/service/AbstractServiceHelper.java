@@ -149,7 +149,11 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
         return null;
     }
 
-    protected Order createOrder(String id, boolean desc) {
+    private Order createOrder(String id, boolean desc) {
+        Order preOrder = orderByService(id, desc);
+        if (preOrder != null) {
+            return preOrder;
+        }
         switch (id) {
             case "id":
             case "createdAt":
@@ -165,11 +169,11 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
         }
     }
 
-    protected boolean isBaseEntity() {
+    private boolean isBaseEntity() {
         return BaseEntity.class.equals(entityClass.getSuperclass());
     }
 
-    protected BooleanExpression filtered(List<Filter> filter) {
+    private BooleanExpression filtered(List<Filter> filter) {
         BooleanExpression predicates = null;
         if(!isBlankCollection(filter) && isBaseEntity()) {
             for (Filter f : filter) {
@@ -182,7 +186,11 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
         return predicates;
     }
 
-    protected BooleanExpression createPredicate(String id, String value) {
+    private BooleanExpression createPredicate(String id, String value) {
+        BooleanExpression predicate = predicateByService(id, value);
+        if (predicate != null) {
+            return predicate;
+        }
         try {
             Method method = predicates().get(id);
             switch (id) {
@@ -195,13 +203,27 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
                     return (BooleanExpression) method.invoke(specClass, value);
             }
         } catch (Exception e) {
-            throw new CustomException(String.format("Entity [%s] doesn't have predicates.", entityClass.getSimpleName()));
+            throw new CustomException(String.format("Entity [%s] doesn't have predicates for [%s].", entityClass.getSimpleName(), id));
         }
     }
 
-    protected Map<String, Method> predicates() throws Exception {
-            Method method = specClass.getDeclaredMethod("predicates");
-            method.setAccessible(true);
-            return  (Map<String, Method>) method.invoke(specClass);
+    private Map<String, Method> predicates() throws Exception {
+        Method method = specClass.getDeclaredMethod("predicates");
+        method.setAccessible(true);
+        return  (Map<String, Method>) method.invoke(specClass);
+    }
+
+    /**
+     * Customize order per service
+     * */
+    protected Order orderByService(String id, boolean desc) {
+        return null;
+    }
+
+    /**
+     * Customize predicate per service
+     * */
+    protected BooleanExpression predicateByService(String id, String value) {
+        return null;
     }
 }

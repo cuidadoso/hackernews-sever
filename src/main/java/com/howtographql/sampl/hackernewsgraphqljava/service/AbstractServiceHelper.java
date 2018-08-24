@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,6 @@ import static com.howtographql.sampl.hackernewsgraphqljava.util.Collections.make
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.NOW;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.NULL;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logError;
-import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logInfo;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.ObjectType.*;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -128,7 +128,7 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
                     .newInstance(entityPage.getContent(), pageInfo(entityPage));
         } catch (Exception e) {
             logError("Error: %s", e.getMessage());
-            throw new GraphQLException("Server error");
+            return null;
         }
     }
 
@@ -143,23 +143,28 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
 
     private Sort orders(List<OrderBy> orderBy) {
         if (!isBlankCollection(orderBy) && isBaseEntity()) {
-            String id = orderBy.get(0).getId();
-            boolean desc = orderBy.get(0).isDesc();
-            switch (id) {
-                case "id":
-                case "createdAt":
-                    return new Sort(new Order(desc ? DESC : ASC, id));
-                default:
-                    try {
-                        // Just to check if classOfEntity contains field with name = fieldName
-                        entityClass.getDeclaredField(id);
-                        return new Sort(new Order(desc ? DESC : ASC, id));
-                    } catch (NoSuchFieldException e) {
-                        logInfo("Entity [%s] doesn't have field [%s].", entityClass.getSimpleName(), id);
-                    }
-            }
+            List<Order> orders = new ArrayList<>();
+            orderBy.forEach(o -> orders.add(createOrder(o.getId(), o.isDesc())));
+            return new Sort(orders);
         }
-        return new Sort(new Order(ASC, "id"));
+        return null;
+    }
+
+    private Order createOrder(String id, boolean desc) {
+        switch (id) {
+            case "id":
+            case "createdAt":
+                return new Order(desc ? DESC : ASC, id);
+            default:
+                try {
+                    // Just to check if classOfEntity contains field with name = fieldName
+                    entityClass.getDeclaredField(id);
+                    return new Order(desc ? DESC : ASC, id);
+                } catch (NoSuchFieldException e) {
+                    logError("Entity [%s] doesn't have field [%s].", entityClass.getSimpleName(), id);
+                    return null;
+                }
+        }
     }
 
     protected boolean isBaseEntity() {
@@ -172,24 +177,30 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
             for (Filter f : filter) {
                 String id = f.getId();
                 String value = f.getValue();
-                try {
-                    Method method = predicates().get(id);
-                    BooleanExpression predicate = (BooleanExpression) method.invoke(specClass, value);
-                    switch (id) {
-                        case "id":
-                        case "createdAt":
-                            predicates = predicates == null ? predicate : predicates.and(predicate);
-                        default:
-                            // Just to check if classOfEntity contains field with name = id
-                            entityClass.getDeclaredField(id);
-                            predicates = predicates == null ? predicate : predicates.and(predicate);
-                    }
-                } catch (Exception e) {
-                    logInfo("Entity [%s] doesn't have predicates.", entityClass.getSimpleName());
-                }
+                BooleanExpression predicate = createPredicate(id, value);
+                predicates = predicates == null ? predicate : predicates.and(predicate);
             }
         }
         return predicates;
+    }
+
+    private BooleanExpression createPredicate(String id, String value) {
+        try {
+            Method method = predicates().get(id);
+            BooleanExpression predicate = (BooleanExpression) method.invoke(specClass, value);
+            switch (id) {
+                case "id":
+                case "createdAt":
+                    return predicate;
+                default:
+                    // Just to check if classOfEntity contains field with name = id
+                    entityClass.getDeclaredField(id);
+                    return predicate;
+            }
+        } catch (Exception e) {
+            logError("Entity [%s] doesn't have predicates.", entityClass.getSimpleName());
+            return null;
+        }
     }
 
     protected Map<String, Method> predicates() throws Exception {

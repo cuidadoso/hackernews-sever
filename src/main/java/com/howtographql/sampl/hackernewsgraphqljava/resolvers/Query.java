@@ -26,7 +26,6 @@ public class Query implements GraphQLQueryResolver {
     // Link query resolvers
     public Links links(List<Filter> filter, int page, int size, List<OrderBy> orderBy) {
         return linkService.findAll(filter, page, size, orderBy);
-
     }
 
     public Link link(Long id) {

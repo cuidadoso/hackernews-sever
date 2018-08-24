@@ -1,6 +1,5 @@
 package com.howtographql.sampl.hackernewsgraphqljava.util;
 
-import graphql.GraphQLException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +24,7 @@ public enum ObjectType {
             return Class.forName(classPath);
         } catch (ClassNotFoundException e) {
             logError("Class [%s] not found. (type %s)", classPath, this.getDescription());
-            throw new GraphQLException(String.format("Class [%s] not found. (type %s)", classPath, this.getDescription()));
+            return null;
         }
     }
 }

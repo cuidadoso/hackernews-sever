@@ -1,5 +1,6 @@
 package com.howtographql.sampl.hackernewsgraphqljava.util;
 
+import graphql.GraphQLException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.java.Log;
 
@@ -14,7 +15,8 @@ public class Logging {
         log.warning(String.format(pattern, args));
     }
 
-    public static void logError(String pattern, Object ... args) {
+    public static void logError(String pattern, Object ... args) throws GraphQLException {
         log.severe(String.format(pattern, args));
+        throw new GraphQLException(String.format(pattern, args));
     }
 }

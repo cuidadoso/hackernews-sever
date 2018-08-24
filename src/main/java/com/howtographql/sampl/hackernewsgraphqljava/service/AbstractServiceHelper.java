@@ -149,7 +149,7 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
         return null;
     }
 
-    private Order createOrder(String id, boolean desc) {
+    protected Order createOrder(String id, boolean desc) {
         switch (id) {
             case "id":
             case "createdAt":

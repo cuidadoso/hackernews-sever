@@ -1,11 +1,10 @@
 package com.howtographql.sampl.hackernewsgraphqljava.util;
 
+import com.howtographql.sampl.hackernewsgraphqljava.resolvers.exceptions.CustomException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
-
-import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logError;
 
 @Getter
 @RequiredArgsConstructor
@@ -23,8 +22,7 @@ public enum ObjectType {
         try {
             return Class.forName(classPath);
         } catch (ClassNotFoundException e) {
-            logError("Class [%s] not found. (type %s)", classPath, this.getDescription());
-            return null;
+            throw new CustomException(String.format("Class [%s] not found. (type %s)", classPath, this.getDescription()));
         }
     }
 }

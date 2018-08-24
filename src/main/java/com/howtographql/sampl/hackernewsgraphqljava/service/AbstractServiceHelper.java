@@ -2,6 +2,7 @@ package com.howtographql.sampl.hackernewsgraphqljava.service;
 
 import com.howtographql.sampl.hackernewsgraphqljava.model.*;
 import com.howtographql.sampl.hackernewsgraphqljava.repository.BaseRepository;
+import com.howtographql.sampl.hackernewsgraphqljava.resolvers.exceptions.CustomException;
 import com.howtographql.sampl.hackernewsgraphqljava.util.ObjectType;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import graphql.GraphQLException;
@@ -22,7 +23,6 @@ import static com.howtographql.sampl.hackernewsgraphqljava.util.Collections.isBl
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Collections.makeList;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.NOW;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.Constants.NULL;
-import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logError;
 import static com.howtographql.sampl.hackernewsgraphqljava.util.ObjectType.*;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -127,8 +127,7 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
             return (Entities) pageableClass.getDeclaredConstructor(List.class, PageInfo.class)
                     .newInstance(entityPage.getContent(), pageInfo(entityPage));
         } catch (Exception e) {
-            logError("Error: %s", e.getMessage());
-            return null;
+            throw new CustomException(String.format("Error: %s", e.getMessage()));
         }
     }
 
@@ -161,8 +160,7 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
                     entityClass.getDeclaredField(id);
                     return new Order(desc ? DESC : ASC, id);
                 } catch (NoSuchFieldException e) {
-                    logError("Entity [%s] doesn't have field [%s].", entityClass.getSimpleName(), id);
-                    return null;
+                    throw new CustomException(String.format("Entity [%s] doesn't have field [%s].", entityClass.getSimpleName(), id));
                 }
         }
     }
@@ -198,8 +196,7 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
                     return predicate;
             }
         } catch (Exception e) {
-            logError("Entity [%s] doesn't have predicates.", entityClass.getSimpleName());
-            return null;
+            throw new CustomException(String.format("Entity [%s] doesn't have predicates.", entityClass.getSimpleName()));
         }
     }
 

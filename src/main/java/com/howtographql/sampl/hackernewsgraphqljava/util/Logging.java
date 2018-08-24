@@ -17,6 +17,5 @@ public class Logging {
 
     public static void logError(String pattern, Object ... args) throws GraphQLException {
         log.severe(String.format(pattern, args));
-        throw new GraphQLException(String.format(pattern, args));
     }
 }

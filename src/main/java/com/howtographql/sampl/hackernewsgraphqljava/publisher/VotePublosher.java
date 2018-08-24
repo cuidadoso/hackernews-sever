@@ -2,6 +2,7 @@ package com.howtographql.sampl.hackernewsgraphqljava.publisher;
 
 import com.howtographql.sampl.hackernewsgraphqljava.model.Vote;
 import com.howtographql.sampl.hackernewsgraphqljava.model.Votes;
+import com.howtographql.sampl.hackernewsgraphqljava.resolvers.exceptions.CustomException;
 import com.howtographql.sampl.hackernewsgraphqljava.service.AbstractService;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -16,7 +17,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.howtographql.sampl.hackernewsgraphqljava.util.Logging.logError;
 import static io.reactivex.BackpressureStrategy.BUFFER;
 
 @Getter
@@ -52,7 +52,7 @@ public class VotePublosher {
             try {
                 emitter.onNext(vote);
             } catch (RuntimeException e) {
-                logError("Cannot send vote", e);
+                throw new CustomException(String.format("Cannot send link %n %s", e.getLocalizedMessage()));
             }
         });
     }

@@ -137,6 +137,7 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
                 .hasPreviousPage(entities.previousPageable() != null)
                 .total(entities.getTotalElements())
                 .totalPages(entities.getTotalPages())
+                .pageNumber(entities.getNumber())
                 .build();
     }
 

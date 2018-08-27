@@ -92,6 +92,7 @@ type PageInfo {
     hasPreviousPage: Boolean!
     total: Long
     totalPages: Int
+    pageNumber: Int
 }
 
 type Links {

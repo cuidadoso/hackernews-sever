@@ -12,4 +12,5 @@ public class PageInfo {
     private final boolean hasPreviousPage;
     private final Long total;
     private final int totalPages;
+    private final int pageNumber;
 }

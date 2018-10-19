@@ -1,6 +1,7 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ALPERE
+    # url: jdbc:postgresql://localhost:5432/ALPERE
+    url: jdbc:postgresql://172.17.123.53:5432/ALPERE
     username: alpere
     password: alpere
 

@@ -20,7 +20,8 @@ public class UserServiceImpl extends AbstractServiceHelper<User, Users> implemen
         super(ImmutableMap.of(
                 ENTITY, "model.User",
                 PAGEABLE, "model.Users",
-                SPEC, "specifications.UserSpecifications"
+                SPEC, "specifications.UserSpecifications",
+                PROJECT_PATH, "com.howtographql.sampl.hackernewsgraphqljava"
         ), repository);
     }
 

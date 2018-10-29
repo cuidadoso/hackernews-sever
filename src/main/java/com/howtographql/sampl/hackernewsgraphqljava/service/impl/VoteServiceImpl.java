@@ -20,7 +20,8 @@ public class VoteServiceImpl extends AbstractServiceHelper<Vote, Votes> implemen
         super(ImmutableMap.of(
                 ENTITY, "model.Vote",
                 PAGEABLE, "model.Votes",
-                SPEC, "specifications.VoteSpecifications"
+                SPEC, "specifications.VoteSpecifications",
+                PROJECT_PATH, "com.howtographql.sampl.hackernewsgraphqljava"
         ), repository);
     }
 

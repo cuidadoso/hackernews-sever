@@ -11,14 +11,13 @@ import java.util.Map;
 public enum ObjectType {
     ENTITY("Model of entity"),
     PAGEABLE("Model of pageable entity list"),
-    SPEC("Filter specifications");
-
-    public static final String PROJECT_PATH = "com.howtographql.sampl.hackernewsgraphqljava.";
+    SPEC("Filter specifications"),
+    PROJECT_PATH("Project path");
 
     private final String description;
 
     public Class getClass(Map<ObjectType, String> classes) {
-        String classPath = PROJECT_PATH + classes.get(this);
+        String classPath = classes.get(PROJECT_PATH) + "." + classes.get(this);
         try {
             return Class.forName(classPath);
         } catch (ClassNotFoundException e) {

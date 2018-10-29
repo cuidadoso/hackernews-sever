@@ -24,7 +24,8 @@ public class LinksServiceImpl extends AbstractServiceHelper<Link, Links> impleme
         super(ImmutableMap.of(
                 ENTITY, "model.Link",
                 PAGEABLE, "model.Links",
-                SPEC, "specifications.LinkSpecifications"
+                SPEC, "specifications.LinkSpecifications",
+                PROJECT_PATH, "com.howtographql.sampl.hackernewsgraphqljava"
                 ), repository);
     }
 

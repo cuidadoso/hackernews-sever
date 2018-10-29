@@ -30,7 +30,6 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @Getter
 public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities extends BaseEntities>
         implements AbstractService<Entity, Entities> {
-    protected final Map<ObjectType, String> classes;
     protected final BaseRepository<Entity> repository;
     protected final Class entityClass;
     protected final Class pageableClass;
@@ -38,7 +37,6 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
 
 
     protected AbstractServiceHelper(Map<ObjectType, String> classes, BaseRepository<Entity> repository) {
-        this.classes = classes;
         this.repository = repository;
         this.entityClass = ENTITY.getClass(classes);
         this.pageableClass = PAGEABLE.getClass(classes);
@@ -67,10 +65,7 @@ public abstract class AbstractServiceHelper<Entity extends BaseEntity, Entities 
 
     public Entities findAll(List<Filter> filter, int page, int size, List<OrderBy> orderBy) {
         BooleanExpression predicate = filtered(filter);
-        Sort sort = orders(orderBy);
-        Pageable pageable = new PageRequest(page, size, sort);
-        Page<Entity> entityPage = page(predicate, pageable);
-        return entities(entityPage);
+        return findAll(predicate, page, size, orderBy);
     }
 
     public Entities findAll(BooleanExpression predicate, int page, int size, List<OrderBy> orderBy) {
